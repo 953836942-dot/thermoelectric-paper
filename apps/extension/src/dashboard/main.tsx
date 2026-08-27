@@ -1,6 +1,5 @@
 import { render } from "preact";
-import { createApiClient } from "../api/client";
-import { getSession } from "../storage/session";
+import { createLocalLiteratureClient } from "../local/client";
 import { Dashboard } from "./Dashboard";
 import "../styles/tokens.css";
 
@@ -10,24 +9,5 @@ function mountNode(): HTMLElement {
   return node;
 }
 
-const root = mountNode();
-
-async function boot() {
-  const session = await getSession();
-  if (!session) {
-    render(
-      <main class="onboarding-placeholder">
-        <p class="eyebrow">LITERATURE MONITOR</p>
-        <h1>Set up your private literature profile</h1>
-        <p>The guided setup and recovery screen arrives next. Your cloud backend is already ready.</p>
-      </main>,
-      root
-    );
-    return;
-  }
-
-  const api = createApiClient(session.apiBaseUrl, session.recoveryKey);
-  render(<Dashboard api={api} />, root);
-}
-
-void boot();
+const api = createLocalLiteratureClient();
+render(<Dashboard api={api} />, mountNode());

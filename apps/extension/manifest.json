@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Literature Monitor",
-  "version": "0.1.0",
-  "description": "Personal literature monitoring with scheduled cloud updates.",
+  "name": "Literature Monitor B-lite",
+  "version": "0.2.0",
+  "description": "Local-first research paper search and weekly digest for Chrome and Edge.",
   "action": {
     "default_title": "Literature Monitor",
     "default_popup": "src/popup/index.html"
@@ -10,7 +10,6 @@
   "options_page": "src/dashboard/index.html",
   "permissions": ["storage"],
   "host_permissions": [
-    "http://127.0.0.1:8787/*",
-    "http://localhost:8787/*"
+    "https://api.openalex.org/*"
   ]
 }
