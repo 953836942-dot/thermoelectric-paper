@@ -6,38 +6,33 @@
 # validation without touching production history.
 # ============================================================
 
-# 1) Top-relevance discovery.
-# Stock paper-digest 0.4.1 cannot reliably filter by journal name/venue from
-# config alone. We therefore prioritize research patterns that are most likely
-# to be useful: strong performance improvements, doping optimization and
-# transport/mechanism engineering. Venue can then be judged from DOI/article page.
+# 1) Performance engineering priority.
+# Stock paper-digest 0.4.1 cannot reliably filter by journal venue from config.
+# This stream instead starts from current thermoelectric-performance papers and
+# retains papers using common high-value optimization/mechanism language.
 [[feeds]]
-name = "TOP RELEVANCE - Performance, Doping and Mechanisms"
+name = "PRIORITY - Performance Engineering"
 source = "openalex"
 sort_by = "relevance"
 queries = [
-  "high thermoelectric performance zT",
-  "thermoelectric interface engineering",
-  "thermoelectric strain engineering",
-  "thermoelectric band engineering",
-  "thermoelectric co-doping",
-  "thermoelectric carrier optimization",
-  "thermoelectric phonon carrier transport",
-  "thermoelectric nanostructuring",
-  "thermoelectric phase engineering"
+  "thermoelectric performance",
+  "thermoelectric materials"
 ]
 types = ["article"]
 keywords = [
-  "thermoelectric performance",
-  "thermoelectric figure of merit",
-  "zT",
-  "power factor",
-  "Seebeck coefficient",
-  "interface engineering",
-  "strain engineering",
-  "band engineering",
+  "alloying",
   "co-doping",
-  "carrier concentration"
+  "codoping",
+  "interface",
+  "interfacial",
+  "strain",
+  "band engineering",
+  "carrier transport",
+  "phonon",
+  "nanostructuring",
+  "phase stability",
+  "phase engineering",
+  "high thermoelectric performance"
 ]
 exclude_keywords = [
   "anomalous Nernst effect",
@@ -174,7 +169,8 @@ exclude_keywords = []
 max_results = 120
 max_items = 8
 
-# 7) Broad journal safety net. Deliberately tiny so generic papers cannot dominate.
+# 7) Broad journal safety net. This stays last; it is deliberately not presented
+# as a quality-ranked venue list because stock config cannot filter venue reliably.
 [[feeds]]
 name = "Broad Thermoelectric Safety Net"
 source = "openalex"
@@ -196,4 +192,4 @@ exclude_keywords = [
   "spin Nernst"
 ]
 max_results = 100
-max_items = 5
+max_items = 10
