@@ -7,5 +7,5 @@
     "types": ["@cloudflare/workers-types", "@cloudflare/vitest-plugin/types", "vitest/globals"]
   },
   "references": [{ "path": "../../packages/literature-core" }],
-  "include": ["src/**/*.ts", "tests/**/*.ts", "tests/**/*.d.ts", "vitest.config.ts"]
+  "include": ["src/**/*.ts", "tests/**/*.ts", "tests/**/*.d.ts", "tests/**/*.json", "vitest.config.ts"]
 }
