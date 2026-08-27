@@ -1,4 +1,4 @@
-import { buildSearchQueries, dedupePapers, normalizePaper } from "@literature-monitor/core";
+import { buildQueries, dedupePapers, normalizePaper } from "@literature-monitor/core";
 import type { CanonicalPaper, RawPaper, ResearchConfig, SearchQuery } from "@literature-monitor/core";
 import { searchArxiv } from "./arxiv";
 import { searchOpenAlex } from "./openalex";
@@ -28,7 +28,7 @@ export async function searchAll(
   fetchImpl: typeof fetch,
   options: SearchAllOptions = {}
 ): Promise<SearchAllResult> {
-  const queries = buildSearchQueries(config);
+  const queries = buildQueries(config);
   const sources = options.sources ?? (["openalex", "arxiv", ...(options.rssFeeds?.length ? ["rss" as const] : [])] as SourceName[]);
   const status: Partial<Record<SourceName, SourceStatus>> = {};
   const raw: RawPaper[] = [];
