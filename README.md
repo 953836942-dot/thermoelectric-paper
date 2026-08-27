@@ -28,6 +28,49 @@ Artifact 解压后，GitHub 会直接把 `output/` 里面的内容放到根目�
 - `latest.json` — 原始结构化数据。
 - `weekly-review.html` / `reading-list.html` / `trends.html` — 历史与反馈相关页面。
 
+## PaperEcho-TE 评估版
+
+当前还有一条独立的 **PaperEcho Thermoelectric Evaluation** 路径，用来和现有 paper-digest 在**同一个最近 7 天候选集**上比较筛选质量。
+
+它目前位于 `paperecho-migration` 分支，不会改变 `main` 上现有的每周 paper-digest 周报和 production 历史。
+
+这条评估路径的做法是：
+
+1. 仍由固定版本的 stock paper-digest 抓取最近 7 天候选文献。
+2. 把完全相同的候选集转换为 PaperEcho Local 输入。
+3. checkout 固定版本的 upstream PaperEcho。
+4. 应用一个很小的 **PaperEcho-TE classifier patch**：关闭 upstream 中写死的 biomedical hard-exclude，并改用热电配置文件中的 negative keywords 做 D 级排除。
+5. 使用 PaperEcho 官方 `paperecho-local` launcher 先 `--check`，再 `--run`。
+6. 输出 A/B/C/D 分级、PaperEcho `周报.xlsx`，以及和 paper-digest 的 `comparison.md/json`。
+
+这条 Phase-1 评估**不需要 Zotero，不需要 API key，也不使用真实 LLM**。
+
+### 怎么手动跑 PaperEcho-TE
+
+在评估尚未合并到 `main` 时：
+
+1. **Actions → PaperEcho Thermoelectric Evaluation**。
+2. 点右上角 **Run workflow**。
+3. `Use workflow from` 选择 **paperecho-migration**。
+4. 点绿色 **Run workflow**。
+5. 等待三个 job 都变成绿色：`adapter-tests`、`classifier-integration`、`seven-day-evaluation`。
+6. 点最新那条运行的黑色粗体标题，滚到页面最下面 **Artifacts**。
+7. 下载 `paperecho-evaluation-...`。
+
+如果以后这条分支合并到 `main`，第 3 步就改成选择 **main**。
+
+### PaperEcho-TE 结果先看什么
+
+Artifact 解压以后，优先看：
+
+- `evaluation/comparison.md` — **最先看这个**，直接列出 A/B/C/D 数量和各等级论文标题。
+- `evaluation/comparison.json` — 同样结果的结构化版本。
+- `evaluation/paperecho-output/exports/.../周报.xlsx` — PaperEcho 生成的可读周报。
+- `evaluation/paperecho-output/state/papers.json` — 每篇文献的 PaperEcho 分级和状态。
+- `paper-digest/output/` — 同一次 7 天扫描的原 paper-digest 输出，方便一一对照。
+
+目前 PaperEcho-TE 仍是**评估版**，现有 `Thermoelectric Paper Digest Weekly` 继续作为 production baseline。确认 PaperEcho-TE 的相关性和分级长期更好以后，再考虑切换到 PaperEcho Web + OpenAlex/RSS + Zotero Web 的正式模式。
+
 ## 在哪里改研究方向
 
 从仓库首页开始：
@@ -56,6 +99,12 @@ Artifact 解压后，GitHub 会直接把 `output/` 里面的内容放到根目�
 - alloying / co-doping / interface engineering / strain engineering / band engineering / carrier transport / phonon engineering / nanostructuring
 
 想加新方向时，在对应 `queries = [...]` 或 `keywords = [...]` 里增加一行即可。提交后 GitHub 自动跑一次 **fresh_scan** 检查效果，不污染正式历史。
+
+PaperEcho-TE 的 A/B/C/D 分级规则目前单独放在：
+
+**Code → paperecho-config → review-workflow-rules.json**
+
+里面控制 A/B/C/D 的重点、机制词和 D 级排除词。Phase-1 里它不会自动修改这些规则。
 
 ## 在哪里加关注研究者
 
@@ -115,10 +164,14 @@ Runtime 会自动拼接：
 
 早期的 **Paper Digest Thermoelectric Stock Smoke** workflow 保留作为最小基准测试。日常使用不需要点它，平时只用 **Thermoelectric Paper Digest Weekly**。
 
-## Upstream pin
+## Upstream pins
 
-Production workflow pins the upstream paper-digest revision already validated by the stock smoke test:
+Production paper-digest workflow pins:
 
 `8906f9a12309956913eab29dade75c01cb7d0771`
 
-Changing this pin is an explicit upstream upgrade and should be revalidated first.
+PaperEcho-TE evaluation pins upstream PaperEcho:
+
+`87a49927306e347553e74b5fbc7b48de8ca09055`
+
+Changing either pin is an explicit upstream upgrade and should be revalidated first.
