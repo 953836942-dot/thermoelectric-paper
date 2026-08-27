@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "description": "Unused biomedical retrieval placeholder for thermoelectric PaperEcho-TE.",
+  "databases": ["pubmed"],
+  "days_back": 7,
+  "retmax": 50,
+  "sort": "date",
+  "datetype": "pdat",
+  "query": "thermoelectric",
+  "keyword_groups": {
+    "required": ["thermoelectric"],
+    "optional": ["Seebeck"],
+    "negative": []
+  },
+  "notes": "Not selected by source_selection.json for non_biomedical_stem."
+}
