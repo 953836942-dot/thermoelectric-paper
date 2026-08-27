@@ -46,6 +46,22 @@ test('A grade is reserved for priority systems or explicit priority optimization
   }
 });
 
+test('real publisher co-doping punctuation still reaches A', { skip: !paperechoRoot }, async () => {
+  const result = await classify(
+    'Enhanced Thermoelectric Performance in Se Alloyed SnS Through Band Engineering, Na and Ag Co‐Doping, and Nanostructuring',
+    'Co‐doping and band engineering improve power factor and zT in SnS.',
+  );
+  assert.equal(result.grade, 'A', JSON.stringify(result));
+});
+
+test('generic carrier concentration outside priority systems is B rather than A', { skip: !paperechoRoot }, async () => {
+  const result = await classify(
+    'Effects of Sn Doping on Charge Transport and Thermoelectric Performance of Wittichenite',
+    'Carrier concentration changes charge transport and improves thermoelectric performance in wittichenite.',
+  );
+  assert.equal(result.grade, 'B', JSON.stringify(result));
+});
+
 test('general thermoelectric mechanism papers are B, not automatically A', { skip: !paperechoRoot }, async () => {
   const result = await classify(
     'Regulating phonon-carrier transport by interfacial symmetry breaking in thermoelectric multilayers',
