@@ -51,15 +51,16 @@ jobs:
       # config validation is intentionally stateless so keyword changes can be
       # evaluated against the full current lookback window without polluting
       # production deduplication state.
+      # v2 cache namespace starts production from a clean baseline after setup validation.
       - name: Restore digest state
         if: ${{ github.event_name != 'push' }}
         id: state-restore
         uses: actions/cache/restore@v5
         with:
           path: paper-digest/.paper-digest-state
-          key: thermoelectric-paper-digest-state-${{ github.run_id }}
+          key: thermoelectric-paper-digest-v2-state-${{ github.run_id }}
           restore-keys: |
-            thermoelectric-paper-digest-state-
+            thermoelectric-paper-digest-v2-state-
 
       - name: Restore archive history
         if: ${{ github.event_name != 'push' }}
@@ -67,9 +68,9 @@ jobs:
         uses: actions/cache/restore@v5
         with:
           path: paper-digest/output
-          key: thermoelectric-paper-digest-output-${{ github.run_id }}
+          key: thermoelectric-paper-digest-v2-output-${{ github.run_id }}
           restore-keys: |
-            thermoelectric-paper-digest-output-
+            thermoelectric-paper-digest-v2-output-
 
       - name: Run weekly digest
         working-directory: paper-digest
@@ -111,11 +112,11 @@ jobs:
         uses: actions/cache/save@v5
         with:
           path: paper-digest/.paper-digest-state
-          key: thermoelectric-paper-digest-state-${{ github.run_id }}
+          key: thermoelectric-paper-digest-v2-state-${{ github.run_id }}
 
       - name: Save archive history
         if: ${{ github.event_name != 'push' && success() && hashFiles('paper-digest/output/**') != '' }}
         uses: actions/cache/save@v5
         with:
           path: paper-digest/output
-          key: thermoelectric-paper-digest-output-${{ github.run_id }}
+          key: thermoelectric-paper-digest-v2-output-${{ github.run_id }}
