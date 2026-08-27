@@ -1,0 +1,85 @@
+name: Paper Digest Thermoelectric Stock Smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/paper-digest-stock-smoke.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout pristine upstream paper-digest
+        uses: actions/checkout@v5
+        with:
+          repository: X-PG13/paper-digest
+          ref: 8906f9a12309956913eab29dade75c01cb7d0771
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install stock paper-digest
+        run: python -m pip install .
+
+      - name: Materialize thermoelectric smoke config
+        run: |
+          cat > config.toml <<'TOML'
+          [app]
+          timezone = "Australia/Brisbane"
+          lookback_hours = 168
+          output_dir = "output"
+          request_delay_seconds = 3
+
+          [state]
+          enabled = true
+          path = ".paper-digest-state/state.json"
+          retention_days = 90
+
+          [feedback]
+          enabled = true
+          path = ".paper-digest-state/feedback.json"
+
+          [[feeds]]
+          name = "Thermoelectric"
+          source = "arxiv"
+          categories = ["cond-mat.mtrl-sci", "physics.app-ph"]
+          keywords = ["thermoelectric", "Seebeck", "power factor", "figure of merit", "zT"]
+          exclude_keywords = []
+          max_results = 100
+          max_items = 20
+          TOML
+
+      - name: Run stock smoke test
+        run: python -m paper_digest --config config.toml
+
+      - name: Verify stock outputs
+        run: |
+          test -s output/latest.json
+          test -s output/latest.md
+          test -s output/site/index.html
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path('output/latest.json').read_text(encoding='utf-8'))
+          print('SMOKE_OK=1')
+          print('LATEST_JSON_TYPE=' + type(data).__name__)
+          print('LATEST_MD_BYTES=' + str(Path('output/latest.md').stat().st_size))
+          print('SITE_INDEX_BYTES=' + str(Path('output/site/index.html').stat().st_size))
+          PY
+
+      - name: Upload smoke-test output
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: thermoelectric-paper-digest-stock-smoke
+          path: output/
+          if-no-files-found: warn
