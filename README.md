@@ -21,30 +21,30 @@ The paper-digest source code is **not modified** here. GitHub Actions checks out
 7. 等待运行变成绿色 ✅，点开这次 run 的**黑色粗体标题**，不是点绿色勾。
 8. 页面底部找到 **Artifacts**，下载 `thermoelectric-paper-digest-...`。
 
-Artifact 解压后，GitHub 会直接把 `output/` 里面的内容放到根目录，所以你通常会直接看到：
+Artifact 解压后，GitHub 会直接把 `output/` 里面的内容放到根目录，所以通常直接看到：
 
 - `index.html` — **最方便，双击直接看网页版**。
 - `latest.md` — 本次 Markdown 周报。
 - `latest.json` — 原始结构化数据。
 - `weekly-review.html` / `reading-list.html` / `trends.html` — 历史与反馈相关页面。
 
-## 你以后主要改哪两个文件
+## 在哪里改研究方向
 
-### 1. 改研究方向 / 材料体系 / 关键词
+从仓库首页开始：
 
-**直接编辑：`configs/research-directions.toml`**
+**Code → configs → research-directions.toml → 右上角铅笔图标 Edit this file**
 
-这个文件就是专门给你改研究兴趣的，里面已经拆成：
+这个文件顶部已经写着 `USER EDIT AREA: RESEARCH DIRECTIONS`，就是专门给你改的。当前分组为：
 
-- `HIGH PRIORITY - High-impact Thermoelectrics`
 - `PRIORITY - Doping Optimization and Transport`
 - `PRIORITY - Thermoelectric ML and Composition`
 - `PRIORITY - Material Systems`
+- `PRIORITY - Performance Engineering`
 - `Fresh Thermoelectric Preprints`
 - `Flexible and Thermoelectric Devices`
-- `Broad Thermoelectric Journals`
+- `Broad Thermoelectric Safety Net`
 
-目前已经重点覆盖：
+目前重点覆盖：
 
 - thermoelectric ML / materials informatics
 - composition → property prediction
@@ -53,47 +53,38 @@ Artifact 解压后，GitHub 会直接把 `output/` 里面的内容放到根目�
 - weighted mobility / quality factor / B factor
 - band convergence / resonant level / bipolar conduction
 - Bi2Te3 / GeTe / PbTe / SnSe / Ag2Se / Mg3Sb2 / half-Heusler / skutterudite
+- alloying / co-doping / interface engineering / strain engineering / band engineering / carrier transport / phonon engineering / nanostructuring
 
-想加新方向时，最简单就是在对应 `queries = [...]` 或 `keywords = [...]` 里增加一行。
+想加新方向时，在对应 `queries = [...]` 或 `keywords = [...]` 里增加一行即可。提交后 GitHub 自动跑一次 **fresh_scan** 检查效果，不污染正式历史。
 
-### 2. 关注研究者
+## 在哪里加关注研究者
 
-**直接编辑：`configs/researchers.toml`**
+从仓库首页开始：
 
-文件里已经放了一个完整模板。做法：
+**Code → configs → researchers.toml → 右上角铅笔图标 Edit this file**
+
+这个文件顶部写着 `USER EDIT AREA: RESEARCHER WATCHLIST`，里面有一个完整的注释模板：
 
 1. 复制模板 block。
-2. 把每行前面的 `#` 去掉。
-3. 把 `Full Name` 换成研究者真实姓名。
-4. 提交。
+2. 删除复制内容每行前面的 `#`。
+3. 把 `Full Name` 替换成研究者真实姓名。
+4. 点 **Commit changes**。
+5. GitHub 会自动 fresh-scan 验证。
 
-例如会变成 `queries = ["Researcher Name thermoelectric", ...]`。
+注意：stock paper-digest 0.4.1 **没有严格 author-ID 过滤字段**。目前研究者监控使用 OpenAlex 的“研究者姓名 + thermoelectric / Seebeck”文本查询，是研究发现功能，不保证 100% 作者身份匹配。
 
-注意：stock paper-digest 0.4.1 **没有严格 author-ID 过滤字段**，所以这里是 OpenAlex 的“姓名 + thermoelectric”查询式监控，不是 100% 严格作者身份过滤。
+## 关于“高质量期刊优先”
 
-## 为什么现在更强调高质量文章
+我们实际测试过 Crossref、OpenAlex 和 Semantic Scholar 的“期刊名 + thermoelectric”stock 配置方案：
 
-`configs/research-directions.toml` 的第一组是 **HIGH PRIORITY**。它用 Crossref bibliographic query 把 thermoelectric 与这些期刊名称组合检索：
+- Crossref 会把部分旧论文因为重新索引时间带进本周结果，容易造成假新文献。
+- OpenAlex / Semantic Scholar 的普通文本查询不能可靠把期刊名称当作严格 venue filter。
 
-- Advanced Materials
-- Advanced Functional Materials
-- Advanced Energy Materials
-- Energy & Environmental Science
-- Joule
-- Matter
-- ACS Energy Letters
-- Nature Communications
-- Science Advances
-- Nano Energy
-- Chemistry of Materials
-- Acta Materialia
-- Scripta Materialia
-- Small
-- Journal of Materials Chemistry A
+因此当前**没有伪装成严格期刊过滤**。在不修改 paper-digest 源码的前提下，正式方案优先按研究价值筛：掺杂优化、材料体系、高性能改善和关键输运机制，再把 broad safety-net 放最后。
 
-原版 paper-digest 没有 `journal = ...` 这种严格 venue filter，所以这个是**高优先级 discovery stream**，不是保证每篇一定来自该期刊。我们用 fresh scan 实际检查结果质量。
+当前 fresh validation 已经能把本周较强的工作拉到 priority streams，例如 Science Advances、Small、Advanced Functional Materials、Advanced Energy Materials 的热电工作，同时过滤了已观察到的 optoelectronics / battery 等明显非热电误报。
 
-同时 Broad Journal feed 已经收窄，避免普通文章把首页占满。
+如果以后明确允许增加一个仓库侧预处理层或修改上游逻辑，才适合做真正的 venue whitelist / journal quality score。
 
 ## 自动运行与两种模式
 
