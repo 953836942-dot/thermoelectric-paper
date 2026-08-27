@@ -6,6 +6,7 @@ import { searchResearchers } from "./api/researchers";
 import { getLatestReport } from "./api/reports";
 import { searchNow } from "./api/search-now";
 import type { Env } from "./env";
+import { runDueProfiles } from "./scheduler/cron";
 
 function errorResponse(status: number, message: string): Response {
   return Response.json({ error: message }, { status });
@@ -71,5 +72,9 @@ export default {
       console.error(error);
       return errorResponse(500, "Internal server error");
     }
+  },
+
+  async scheduled(controller: ScheduledController, env: Env): Promise<void> {
+    await runDueProfiles(env, new Date(controller.scheduledTime), 10);
   }
 };
