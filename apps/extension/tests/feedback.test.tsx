@@ -38,7 +38,9 @@ describe("paper feedback", () => {
   });
 
   it("rolls back optimistic feedback and shows an error when the API fails", async () => {
-    const sendFeedback = vi.fn().mockRejectedValue(new Error("network down"));
+    let rejectFeedback!: () => void;
+    const pending = new Promise((_, reject) => { rejectFeedback = () => reject(new Error("network down")); });
+    const sendFeedback = vi.fn().mockReturnValue(pending);
     const user = userEvent.setup();
     render(<PaperCard paper={paper} sendFeedback={sendFeedback} />);
 
@@ -46,6 +48,7 @@ describe("paper feedback", () => {
     await user.click(button);
     expect(button.getAttribute("aria-pressed")).toBe("true");
 
+    rejectFeedback();
     await waitFor(() => expect(button.getAttribute("aria-pressed")).toBe("false"));
     expect(screen.getByRole("alert").textContent).toMatch(/could not save/i);
   });
