@@ -66,7 +66,7 @@ describe("Popup", () => {
     await user.click(button);
     expect(api.searchNow).toHaveBeenCalledTimes(1);
     expect(button.disabled).toBe(true);
-    expect(screen.getByText(/Searching/i)).toBeTruthy();
+    expect(screen.getByRole("status").textContent).toMatch(/Searching/i);
 
     resolveSearch();
     await waitFor(() => expect(api.getLatestReport).toHaveBeenCalledTimes(2));
