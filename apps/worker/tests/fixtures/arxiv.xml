@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:arxiv="http://arxiv.org/schemas/atom">
+  <title>ArXiv Query</title>
+  <entry>
+    <id>http://arxiv.org/abs/2608.12345v1</id>
+    <updated>2026-08-21T10:00:00Z</updated>
+    <published>2026-08-21T10:00:00Z</published>
+    <title>Composition-aware machine learning for thermoelectric materials</title>
+    <summary>We predict thermoelectric properties and dopant response from composition.</summary>
+    <author><name>Alex Author</name></author>
+    <author><name>Mei Author</name></author>
+    <link href="https://arxiv.org/abs/2608.12345" rel="alternate" type="text/html" />
+    <arxiv:doi>10.1000/arxiv.2026.001</arxiv:doi>
+  </entry>
+</feed>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Example Journal</title>
+    <item>
+      <title>Band convergence enables high thermoelectric quality factor</title>
+      <link>https://journal.example/paper-1</link>
+      <guid>https://journal.example/paper-1</guid>
+      <pubDate>Sat, 22 Aug 2026 09:30:00 GMT</pubDate>
+      <description><![CDATA[Band convergence improves carrier transport while retaining low thermal conductivity.]]></description>
+      <dc:creator>R. Example</dc:creator>
+      <dc:identifier>doi:10.1000/rss.2026.001</dc:identifier>
+    </item>
+  </channel>
+</rss>

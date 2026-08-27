@@ -1,0 +1,54 @@
+{
+  "works": [
+    {
+      "id": "https://openalex.org/W1234567890",
+      "title": "High-performance thermoelectric transport in doped GeTe",
+      "doi": "https://doi.org/10.1000/te.2026.001",
+      "publication_date": "2026-08-20",
+      "abstract_inverted_index": {
+        "Doping": [0],
+        "improves": [1],
+        "weighted": [2],
+        "mobility": [3]
+      },
+      "authorships": [
+        {
+          "author": {
+            "id": "https://openalex.org/A1111111111",
+            "display_name": "Jane Researcher"
+          }
+        },
+        {
+          "author": {
+            "id": "https://openalex.org/A2222222222",
+            "display_name": "Li Scientist"
+          }
+        }
+      ],
+      "primary_location": {
+        "landing_page_url": "https://doi.org/10.1000/te.2026.001",
+        "source": {
+          "display_name": "Advanced Materials"
+        }
+      }
+    }
+  ],
+  "authors": [
+    {
+      "id": "https://openalex.org/A1111111111",
+      "display_name": "Jane Researcher",
+      "works_count": 87,
+      "last_known_institutions": [
+        { "display_name": "University of Example" }
+      ]
+    },
+    {
+      "id": "https://openalex.org/A3333333333",
+      "display_name": "Jane Researcher",
+      "works_count": 24,
+      "last_known_institutions": [
+        { "display_name": "Institute of Materials" }
+      ]
+    }
+  ]
+}

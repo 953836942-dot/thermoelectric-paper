@@ -14,4 +14,9 @@ declare global {
   }
 }
 
+declare module "*.xml?raw" {
+  const content: string;
+  export default content;
+}
+
 export {};
