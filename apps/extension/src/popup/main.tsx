@@ -14,8 +14,13 @@ function extensionRuntime(): RuntimeLike {
   return runtime;
 }
 
-const root = document.getElementById("app");
-if (!root) throw new Error("Popup mount node not found");
+function mountNode(): HTMLElement {
+  const node = document.getElementById("app");
+  if (!node) throw new Error("Popup mount node not found");
+  return node;
+}
+
+const root = mountNode();
 
 async function boot() {
   const session = await getSession();
