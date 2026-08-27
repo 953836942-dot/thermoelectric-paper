@@ -7,12 +7,14 @@
 # ============================================================
 
 # 1) High-priority journal discovery.
-# Stock paper-digest has no strict journal/source-name filter, so this feed uses
-# Crossref bibliographic queries containing journal names plus thermoelectric terms.
-# Treat it as a high-priority discovery stream, not a guaranteed venue filter.
+# Stock paper-digest has no strict journal/source-name filter. This feed therefore
+# uses OpenAlex text queries containing journal names plus thermoelectric terms.
+# OpenAlex is used instead of Crossref here because its publication date is suitable
+# for the weekly lookback window; Crossref can surface old papers by re-index date.
+# Treat this as a high-priority discovery stream, not a guaranteed venue filter.
 [[feeds]]
 name = "HIGH PRIORITY - High-impact Thermoelectrics"
-source = "crossref"
+source = "openalex"
 sort_by = "relevance"
 queries = [
   "thermoelectric Advanced Materials",
@@ -22,6 +24,7 @@ queries = [
   "thermoelectric Joule",
   "thermoelectric Matter",
   "thermoelectric ACS Energy Letters",
+  "thermoelectric Nature Materials",
   "thermoelectric Nature Communications",
   "thermoelectric Science Advances",
   "thermoelectric Nano Energy",
@@ -31,7 +34,7 @@ queries = [
   "thermoelectric Small",
   "thermoelectric Journal of Materials Chemistry A"
 ]
-types = ["journal-article"]
+types = ["article"]
 keywords = [
   "thermoelectric",
   "Seebeck coefficient",
@@ -44,8 +47,8 @@ exclude_keywords = [
   "spin Nernst",
   "spin caloritronics"
 ]
-max_results = 80
-max_items = 20
+max_results = 100
+max_items = 15
 
 # 2) Doping optimization and transport physics.
 [[feeds]]
@@ -174,7 +177,7 @@ exclude_keywords = []
 max_results = 120
 max_items = 10
 
-# 7) Broad journal safety net. Kept smaller so generic papers do not dominate.
+# 7) Broad journal safety net. Kept small so generic papers do not dominate.
 [[feeds]]
 name = "Broad Thermoelectric Journals"
 source = "openalex"
@@ -196,4 +199,4 @@ exclude_keywords = [
   "spin Nernst"
 ]
 max_results = 100
-max_items = 15
+max_items = 10
