@@ -9,12 +9,9 @@ describe("typed API client", () => {
     }));
     const api = createApiClient("https://api.example", "rk_test", fetchMock);
     await api.getProfile();
-    expect(fetchMock).toHaveBeenCalledWith(
-      "https://api.example/v1/profile",
-      expect.objectContaining({
-        headers: expect.objectContaining({ Authorization: "Bearer rk_test" })
-      })
-    );
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe("https://api.example/v1/profile");
+    expect(new Headers(init.headers).get("Authorization")).toBe("Bearer rk_test");
   });
 
   it("does not send bearer auth when creating a new anonymous profile", async () => {
@@ -24,7 +21,7 @@ describe("typed API client", () => {
     }));
     const api = createApiClient("https://api.example", null, fetchMock);
     await api.createProfile(null);
-    const [, init] = fetchMock.mock.calls[0];
-    expect((init?.headers as Record<string, string> | undefined)?.Authorization).toBeUndefined();
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(new Headers(init.headers).get("Authorization")).toBeNull();
   });
 });
