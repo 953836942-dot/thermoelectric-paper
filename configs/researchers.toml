@@ -1,0 +1,38 @@
+# ============================================================
+# USER EDIT AREA: RESEARCHER WATCHLIST
+# Edit THIS file when you want to follow specific researchers.
+#
+# IMPORTANT: stock paper-digest 0.4.1 does not expose a first-class author-ID
+# filter. Researcher monitoring therefore uses OpenAlex text queries combining
+# the researcher's name with thermoelectric terms. This is useful discovery,
+# but it is not guaranteed strict author identity matching.
+#
+# HOW TO ADD A RESEARCHER:
+# 1. Copy the block below.
+# 2. Remove the leading # characters from the copied block.
+# 3. Replace Full Name with the researcher's actual name.
+# 4. Commit the change. A fresh_scan validation will run automatically.
+# ============================================================
+
+# [[feeds]]
+# name = "RESEARCHER - Full Name"
+# source = "openalex"
+# sort_by = "relevance"
+# queries = [
+#   "Full Name thermoelectric",
+#   "Full Name Seebeck",
+#   "Full Name thermoelectric materials"
+# ]
+# types = ["article"]
+# keywords = [
+#   "thermoelectric",
+#   "Seebeck coefficient",
+#   "power factor",
+#   "figure of merit",
+#   "zT"
+# ]
+# exclude_keywords = []
+# max_results = 50
+# max_items = 10
+
+# Add another copied block below for each additional researcher.
