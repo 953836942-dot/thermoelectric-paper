@@ -49,6 +49,7 @@ h2 { margin: 0; font-size: 14px; }
 .secondary-button { border: 1px solid #cfd5e0; background: white; color: #27364e; }
 .setup-shell { min-height: 220px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; }
 .setup-shell .primary-button { padding: 0 16px; }
+.preview-note { margin: 0 0 10px; padding: 9px 10px; border: 1px solid #d9e3ef; border-radius: 10px; background: #eef4fb; color: #46617f; font-size: 10px; line-height: 1.4; }
 
 .dashboard-body { min-width: 760px; min-height: 100vh; }
 .dashboard-shell { min-height: 100vh; background: #f5f7fb; }
@@ -95,4 +96,23 @@ a.dashboard-paper-title:hover { text-decoration: underline; }
 .onboarding-placeholder { max-width: 680px; margin: 80px auto; padding: 28px; background: white; border: 1px solid #dfe4ed; border-radius: 18px; }
 .onboarding-placeholder p:last-child { color: #68738a; line-height: 1.6; }
 
+.research-hero { align-items: center; }
+.template-button { padding: 0 14px; white-space: nowrap; }
+.settings-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.settings-card { display: flex; flex-direction: column; gap: 6px; padding: 16px; border: 1px solid #dfe4ed; border-radius: 14px; background: white; box-shadow: 0 6px 20px rgba(24,35,55,.03); }
+.settings-label { font-size: 13px; font-weight: 750; color: #26354d; }
+.settings-hint { min-height: 16px; color: #818a9b; font-size: 10px; }
+.settings-card textarea { width: 100%; resize: vertical; min-height: 116px; border: 1px solid #d9dee7; border-radius: 10px; padding: 10px 11px; background: #fbfcfe; color: #26354d; font: inherit; font-size: 12px; line-height: 1.45; }
+.settings-card textarea:focus { outline: 2px solid #b6c8df; border-color: #9db4cf; }
+.settings-actions { display: flex; align-items: center; gap: 14px; margin-top: 18px; }
+.settings-save { padding: 0 18px; }
+.settings-status { color: #5f6e84; font-size: 11px; }
+
 button:focus-visible, a:focus-visible { outline: 2px solid #2d6cdf; outline-offset: 2px; }
+
+@media (max-width: 820px) {
+  .dashboard-body { min-width: 0; }
+  .dashboard-topbar { align-items: flex-start; flex-direction: column; }
+  .dashboard-hero { align-items: flex-start; flex-direction: column; }
+  .settings-grid { grid-template-columns: 1fr; }
+}
