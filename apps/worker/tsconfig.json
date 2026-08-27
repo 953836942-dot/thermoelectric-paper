@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "dist",
+    "rootDir": ".",
+    "types": ["@cloudflare/workers-types", "@cloudflare/vitest-plugin/types", "vitest/globals"]
+  },
+  "references": [{ "path": "../../packages/literature-core" }],
+  "include": ["src/**/*.ts", "tests/**/*.ts", "tests/**/*.d.ts", "vitest.config.ts"]
+}

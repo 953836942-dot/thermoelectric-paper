@@ -1,0 +1,19 @@
+{
+  "name": "@literature-monitor/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run --config vitest.config.ts",
+    "typecheck": "tsc -b",
+    "dev": "wrangler dev"
+  },
+  "dependencies": {
+    "@literature-monitor/core": "0.1.0"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "^1.0.0",
+    "@cloudflare/workers-types": "^4.0.0",
+    "wrangler": "^4.0.0"
+  }
+}

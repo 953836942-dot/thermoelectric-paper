@@ -1,6 +1,7 @@
 {
   "files": [],
   "references": [
-    { "path": "./packages/literature-core" }
+    { "path": "./packages/literature-core" },
+    { "path": "./apps/worker" }
   ]
 }
