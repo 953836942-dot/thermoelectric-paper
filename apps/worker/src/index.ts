@@ -1,6 +1,10 @@
 import { authenticate } from "./auth";
+import { postFeedback } from "./api/feedback";
+import { getPapers } from "./api/papers";
 import { createProfile, getProfile, updateProfile } from "./api/profile";
 import { searchResearchers } from "./api/researchers";
+import { getLatestReport } from "./api/reports";
+import { searchNow } from "./api/search-now";
 import type { Env } from "./env";
 
 function errorResponse(status: number, message: string): Response {
@@ -34,6 +38,30 @@ export default {
         if (request.method !== "GET") return errorResponse(405, "Method not allowed");
         await authenticate(request, env);
         return searchResearchers(request, globalThis.fetch.bind(globalThis));
+      }
+
+      if (url.pathname === "/v1/search-now") {
+        if (request.method !== "POST") return errorResponse(405, "Method not allowed");
+        const { profileId } = await authenticate(request, env);
+        return searchNow(env, profileId);
+      }
+
+      if (url.pathname === "/v1/report/latest") {
+        if (request.method !== "GET") return errorResponse(405, "Method not allowed");
+        const { profileId } = await authenticate(request, env);
+        return getLatestReport(env, profileId);
+      }
+
+      if (url.pathname === "/v1/papers") {
+        if (request.method !== "GET") return errorResponse(405, "Method not allowed");
+        const { profileId } = await authenticate(request, env);
+        return getPapers(request, env, profileId);
+      }
+
+      if (url.pathname === "/v1/feedback") {
+        if (request.method !== "POST") return errorResponse(405, "Method not allowed");
+        const { profileId } = await authenticate(request, env);
+        return postFeedback(request, env, profileId);
       }
 
       return errorResponse(404, "Not found");
