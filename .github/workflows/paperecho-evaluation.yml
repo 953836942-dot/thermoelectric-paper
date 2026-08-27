@@ -7,6 +7,8 @@ on:
     paths:
       - 'tests/paperecho/**'
       - 'scripts/paperecho/**'
+      - 'paperecho-config/**'
+      - 'paperecho-patch/**'
       - '.github/workflows/paperecho-evaluation.yml'
 
 permissions:
@@ -20,5 +22,32 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Run PaperEcho adapter tests
+      - name: Run repository-side PaperEcho tests
         run: node --test tests/paperecho/*.test.mjs
+
+  classifier-integration-red:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout thermoelectric control repository
+        uses: actions/checkout@v5
+        with:
+          path: control
+      - name: Checkout pinned stock PaperEcho
+        uses: actions/checkout@v5
+        with:
+          repository: Chip-G0202/PaperEcho
+          ref: 87a49927306e347553e74b5fbc7b48de8ca09055
+          path: PaperEcho
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install stock PaperEcho dependencies
+        working-directory: PaperEcho
+        run: npm ci
+      - name: Install thermoelectric rule configuration only
+        run: cp control/paperecho-config/review-workflow-rules.json PaperEcho/config/review-workflow-rules.json
+      - name: Run classifier behavior test against unpatched stock classifier
+        env:
+          PAPERECHO_ROOT: ${{ github.workspace }}/PaperEcho
+        working-directory: control
+        run: node --test tests/paperecho/classifier-behavior.test.mjs
