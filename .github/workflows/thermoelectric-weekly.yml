@@ -17,7 +17,9 @@ on:
   push:
     branches: [main]
     paths:
-      - "configs/thermoelectric-weekly.toml"
+      - "configs/base.toml"
+      - "configs/research-directions.toml"
+      - "configs/researchers.toml"
       - ".github/workflows/thermoelectric-weekly.yml"
 
 permissions:
@@ -54,7 +56,12 @@ jobs:
         run: python -m pip install ./paper-digest
 
       - name: Materialize production config
-        run: cp control/configs/thermoelectric-weekly.toml paper-digest/config.toml
+        run: |
+          cat \
+            control/configs/base.toml \
+            control/configs/research-directions.toml \
+            control/configs/researchers.toml \
+            > paper-digest/config.toml
 
       - name: Show run mode
         run: |
