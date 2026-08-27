@@ -1,0 +1,202 @@
+name: PaperEcho Thermoelectric Weekly
+
+on:
+  schedule:
+    # Brisbane is UTC+10 year-round: Sunday 22:07 UTC = Monday 08:07 AEST.
+    - cron: "7 22 * * 0"
+  workflow_dispatch:
+  push:
+    branches: [main, paperecho-migration]
+    paths:
+      - "configs/base.toml"
+      - "configs/research-directions.toml"
+      - "configs/researchers.toml"
+      - "paperecho-config/**"
+      - "paperecho-patch/**"
+      - "scripts/paperecho/**"
+      - "tests/paperecho/**"
+      - ".github/workflows/paperecho-weekly.yml"
+      - "README.md"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: paperecho-thermoelectric-weekly-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout thermoelectric control repository
+        uses: actions/checkout@v5
+        with:
+          path: control
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run repository-side tests
+        working-directory: control
+        run: node --test tests/paperecho/*.test.mjs
+
+      - name: Checkout pinned stock PaperEcho
+        uses: actions/checkout@v5
+        with:
+          repository: Chip-G0202/PaperEcho
+          ref: 87a49927306e347553e74b5fbc7b48de8ca09055
+          path: PaperEcho
+
+      - name: Install stock PaperEcho dependencies
+        working-directory: PaperEcho
+        run: npm ci
+
+      - name: Install thermoelectric classifier configuration
+        run: cp control/paperecho-config/review-workflow-rules.json PaperEcho/config/review-workflow-rules.json
+
+      - name: Apply minimal thermoelectric classifier patch
+        run: node control/paperecho-patch/apply-te-classifier-patch.mjs PaperEcho/workflow/tools/stage1/rule_classifier.mjs
+
+      - name: Verify thermoelectric A/B/C/D behavior
+        env:
+          PAPERECHO_ROOT: ${{ github.workspace }}/PaperEcho
+        working-directory: control
+        run: node --test tests/paperecho/classifier-behavior.test.mjs
+
+  weekly:
+    needs: quality-gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout thermoelectric control repository
+        uses: actions/checkout@v5
+        with:
+          path: control
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Checkout pinned stock paper-digest collector
+        uses: actions/checkout@v5
+        with:
+          repository: X-PG13/paper-digest
+          ref: 8906f9a12309956913eab29dade75c01cb7d0771
+          path: paper-digest
+
+      - name: Install stock paper-digest collector
+        run: python -m pip install ./paper-digest
+
+      - name: Materialize thermoelectric search configuration
+        run: |
+          cat \
+            control/configs/base.toml \
+            control/configs/research-directions.toml \
+            control/configs/researchers.toml \
+            > paper-digest/config.toml
+
+      - name: Collect the latest 7-day thermoelectric candidates
+        working-directory: paper-digest
+        run: python -m paper_digest --config config.toml
+
+      - name: Convert candidates for PaperEcho
+        id: candidates
+        run: |
+          mkdir -p evaluation
+          node control/scripts/paperecho/convert-paper-digest.mjs paper-digest/output/latest.json evaluation/candidates.json
+          COUNT="$(node -e "const a=require('./evaluation/candidates.json'); process.stdout.write(String(a.length))")"
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "CANDIDATE_COUNT=$COUNT"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Checkout pinned stock PaperEcho
+        if: steps.candidates.outputs.count != '0'
+        uses: actions/checkout@v5
+        with:
+          repository: Chip-G0202/PaperEcho
+          ref: 87a49927306e347553e74b5fbc7b48de8ca09055
+          path: PaperEcho
+
+      - name: Install stock PaperEcho dependencies
+        if: steps.candidates.outputs.count != '0'
+        working-directory: PaperEcho
+        run: npm ci
+
+      - name: Install thermoelectric PaperEcho configuration
+        if: steps.candidates.outputs.count != '0'
+        run: |
+          cp control/paperecho-config/source_selection.json PaperEcho/config/source_selection.json
+          cp control/paperecho-config/openalex_search.json PaperEcho/config/openalex_search.json
+          cp control/paperecho-config/rss_sources.json PaperEcho/config/rss_sources.json
+          cp control/paperecho-config/pubmed_pmc_search.json PaperEcho/config/pubmed_pmc_search.json
+          cp control/paperecho-config/review-workflow-rules.json PaperEcho/config/review-workflow-rules.json
+          cp control/paperecho-config/paperecho.local.config.json PaperEcho/config/paperecho.config.json
+
+      - name: Apply minimal PaperEcho-TE classifier patch
+        if: steps.candidates.outputs.count != '0'
+        run: node control/paperecho-patch/apply-te-classifier-patch.mjs PaperEcho/workflow/tools/stage1/rule_classifier.mjs
+
+      - name: PaperEcho Local preflight
+        if: steps.candidates.outputs.count != '0'
+        working-directory: PaperEcho
+        run: >-
+          node skills/paperecho-local/scripts/run.mjs --check
+          --config config/paperecho.config.json
+          --input ../evaluation/candidates.json
+          --output-root ../evaluation/paperecho-output
+
+      - name: Run PaperEcho-TE triage
+        if: steps.candidates.outputs.count != '0'
+        working-directory: PaperEcho
+        run: >-
+          node skills/paperecho-local/scripts/run.mjs --run
+          --config config/paperecho.config.json
+          --input ../evaluation/candidates.json
+          --output-root ../evaluation/paperecho-output
+
+      - name: Build comparison summary
+        if: steps.candidates.outputs.count != '0'
+        run: node control/scripts/paperecho/compare-results.mjs paper-digest/output/latest.json evaluation/paperecho-output/state/papers.json evaluation
+
+      - name: Prepare empty-week result
+        if: steps.candidates.outputs.count == '0'
+        run: |
+          mkdir -p evaluation/paperecho-output/state
+          printf '%s\n' '{"schema_version":1,"papers":[]}' > evaluation/paperecho-output/state/papers.json
+          printf '%s\n' '{"candidate_count":0,"paperecho_stored_count":0,"duplicate_reduction":0,"grade_counts":{"A":0,"B":0,"C":0,"D":0,"unknown":0},"top_by_grade":{"A":[],"B":[],"C":[],"D":[],"unknown":[]}}' > evaluation/comparison.json
+          printf '# PaperEcho Thermoelectric Weekly\n\nNo new candidates in the current 7-day scan.\n' > evaluation/comparison.md
+
+      - name: Build user-facing weekly homepage
+        run: |
+          node control/scripts/paperecho/build-report.mjs evaluation/paperecho-output/state/papers.json evaluation/comparison.json delivery
+          cp evaluation/comparison.md delivery/comparison.md
+          cp evaluation/paperecho-output/state/papers.json delivery/papers.json
+          cp paper-digest/output/latest.md delivery/source-digest.md
+          XLSX="$(find evaluation/paperecho-output/exports -type f -name '*.xlsx' -print -quit 2>/dev/null || true)"
+          if [ -n "$XLSX" ]; then cp "$XLSX" "delivery/周报.xlsx"; fi
+
+      - name: Verify report is directly readable
+        run: |
+          test -s delivery/index.html
+          test -s delivery/report.json
+          test -s delivery/comparison.md
+          test -s delivery/papers.json
+          grep -q "Top papers this week" delivery/index.html
+          if [ "${{ steps.candidates.outputs.count }}" != "0" ]; then test -s "delivery/周报.xlsx"; fi
+
+      - name: Upload PaperEcho-TE weekly report
+        uses: actions/upload-artifact@v7
+        with:
+          name: paperecho-te-weekly-${{ github.run_number }}
+          retention-days: 90
+          if-no-files-found: error
+          path: delivery/
