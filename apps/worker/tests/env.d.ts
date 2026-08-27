@@ -5,3 +5,13 @@ declare module "cloudflare:workers" {
     TEST_MIGRATIONS: unknown[];
   }
 }
+
+declare global {
+  namespace Cloudflare {
+    interface Env extends WorkerEnv {
+      TEST_MIGRATIONS: unknown[];
+    }
+  }
+}
+
+export {};
