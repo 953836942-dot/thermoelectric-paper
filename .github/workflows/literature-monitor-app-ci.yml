@@ -6,6 +6,7 @@ on:
     paths:
       - "package.json"
       - "package-lock.json"
+      - "tsconfig.json"
       - "tsconfig.base.json"
       - "packages/**"
       - "apps/**"
@@ -25,4 +26,5 @@ jobs:
           node-version: "22"
       - run: npm install
       - run: npm test -- packages/literature-core/tests
+      - run: npm --workspace apps/worker test
       - run: npm run typecheck
