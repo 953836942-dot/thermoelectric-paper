@@ -1,7 +1,7 @@
-import type { Env } from "../src/env";
+import type { Env as WorkerEnv } from "../src/env";
 
 declare module "cloudflare:workers" {
-  interface ProvidedEnv extends Env {
+  interface ProvidedEnv extends WorkerEnv {
     TEST_MIGRATIONS: unknown[];
   }
 }
