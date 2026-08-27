@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "description": "Journal RSS sources for PaperEcho-TE. Empty during Phase 1; real journal feed URLs are added only after verification.",
+  "sources": []
+}
