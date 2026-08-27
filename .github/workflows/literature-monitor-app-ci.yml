@@ -1,0 +1,29 @@
+name: Literature Monitor App CI
+
+on:
+  push:
+    branches: [literature-monitor-app]
+    paths:
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig.base.json"
+      - "packages/**"
+      - "apps/**"
+      - ".github/workflows/literature-monitor-app-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm install
+      - run: npm test -- packages/literature-core/tests
+      - run: npm run typecheck
