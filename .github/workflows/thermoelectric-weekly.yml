@@ -5,6 +5,15 @@ on:
     # Brisbane is UTC+10 year-round: Sunday 22:07 UTC = Monday 08:07 AEST.
     - cron: "7 22 * * 0"
   workflow_dispatch:
+    inputs:
+      scan_mode:
+        description: "Run mode: production keeps history; fresh_scan ignores history"
+        required: true
+        default: "production"
+        type: choice
+        options:
+          - production
+          - fresh_scan
   push:
     branches: [main]
     paths:
@@ -47,13 +56,22 @@ jobs:
       - name: Materialize production config
         run: cp control/configs/thermoelectric-weekly.toml paper-digest/config.toml
 
-      # Scheduled and manual production runs keep state/history. Push-triggered
-      # config validation is intentionally stateless so keyword changes can be
-      # evaluated against the full current lookback window without polluting
-      # production deduplication state.
-      # v2 cache namespace starts production from a clean baseline after setup validation.
+      - name: Show run mode
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "RUN_MODE=production (scheduled)"
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "RUN_MODE=${{ inputs.scan_mode }} (manual)"
+          else
+            echo "RUN_MODE=fresh_scan (config validation push)"
+          fi
+
+      # Production means scheduled runs, or a manual run with scan_mode=production.
+      # It restores state/history so already-seen papers are deduplicated.
+      # Manual fresh_scan and push-triggered config validation intentionally do not
+      # restore or save production state, so they cannot pollute weekly history.
       - name: Restore digest state
-        if: ${{ github.event_name != 'push' }}
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.scan_mode == 'production') }}
         id: state-restore
         uses: actions/cache/restore@v5
         with:
@@ -63,7 +81,7 @@ jobs:
             thermoelectric-paper-digest-v2-state-
 
       - name: Restore archive history
-        if: ${{ github.event_name != 'push' }}
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.scan_mode == 'production') }}
         id: output-restore
         uses: actions/cache/restore@v5
         with:
@@ -98,24 +116,24 @@ jobs:
           print("SITE_INDEX_BYTES=" + str(site_index.stat().st_size))
           PY
 
-      - name: Upload weekly digest artifact
+      - name: Upload digest artifact
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: thermoelectric-paper-digest-weekly-${{ github.run_number }}
+          name: thermoelectric-paper-digest-${{ github.run_number }}
           path: paper-digest/output/
           if-no-files-found: warn
           retention-days: 90
 
       - name: Save digest state
-        if: ${{ github.event_name != 'push' && always() && hashFiles('paper-digest/.paper-digest-state/**') != '' }}
+        if: ${{ (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.scan_mode == 'production')) && always() && hashFiles('paper-digest/.paper-digest-state/**') != '' }}
         uses: actions/cache/save@v5
         with:
           path: paper-digest/.paper-digest-state
           key: thermoelectric-paper-digest-v2-state-${{ github.run_id }}
 
       - name: Save archive history
-        if: ${{ github.event_name != 'push' && success() && hashFiles('paper-digest/output/**') != '' }}
+        if: ${{ (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.scan_mode == 'production')) && success() && hashFiles('paper-digest/output/**') != '' }}
         uses: actions/cache/save@v5
         with:
           path: paper-digest/output
