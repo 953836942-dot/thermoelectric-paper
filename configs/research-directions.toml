@@ -6,47 +6,46 @@
 # validation without touching production history.
 # ============================================================
 
-# 1) High-priority journal discovery.
-# Stock paper-digest has no strict journal/source-name filter. This feed therefore
-# uses Semantic Scholar text queries containing journal names plus thermoelectric
-# terms. Treat it as a high-priority discovery stream, not a guaranteed venue filter.
+# 1) Top-relevance discovery.
+# Stock paper-digest 0.4.1 cannot reliably filter by journal name/venue from
+# config alone. We therefore prioritize research patterns that are most likely
+# to be useful: strong performance improvements, doping optimization and
+# transport/mechanism engineering. Venue can then be judged from DOI/article page.
 [[feeds]]
-name = "HIGH PRIORITY - High-impact Thermoelectrics"
-source = "semantic_scholar"
+name = "TOP RELEVANCE - Performance, Doping and Mechanisms"
+source = "openalex"
 sort_by = "relevance"
 queries = [
-  "thermoelectric Advanced Materials",
-  "thermoelectric Advanced Functional Materials",
-  "thermoelectric Advanced Energy Materials",
-  "thermoelectric Energy Environmental Science",
-  "thermoelectric Joule",
-  "thermoelectric Matter",
-  "thermoelectric ACS Energy Letters",
-  "thermoelectric Nature Materials",
-  "thermoelectric Nature Communications",
-  "thermoelectric Science Advances",
-  "thermoelectric Nano Energy",
-  "thermoelectric Chemistry of Materials",
-  "thermoelectric Acta Materialia",
-  "thermoelectric Scripta Materialia",
-  "thermoelectric Small",
-  "thermoelectric Journal of Materials Chemistry A"
+  "high thermoelectric performance zT",
+  "thermoelectric interface engineering",
+  "thermoelectric strain engineering",
+  "thermoelectric band engineering",
+  "thermoelectric co-doping",
+  "thermoelectric carrier optimization",
+  "thermoelectric phonon carrier transport",
+  "thermoelectric nanostructuring",
+  "thermoelectric phase engineering"
 ]
-types = ["JournalArticle"]
+types = ["article"]
 keywords = [
-  "thermoelectric",
-  "Seebeck coefficient",
+  "thermoelectric performance",
+  "thermoelectric figure of merit",
+  "zT",
   "power factor",
-  "figure of merit",
-  "zT"
+  "Seebeck coefficient",
+  "interface engineering",
+  "strain engineering",
+  "band engineering",
+  "co-doping",
+  "carrier concentration"
 ]
 exclude_keywords = [
   "anomalous Nernst effect",
   "spin Nernst",
   "spin caloritronics"
 ]
-max_results = 100
-max_items = 15
+max_results = 120
+max_items = 12
 
 # 2) Doping optimization and transport physics.
 [[feeds]]
@@ -173,11 +172,11 @@ keywords = [
 ]
 exclude_keywords = []
 max_results = 120
-max_items = 10
+max_items = 8
 
-# 7) Broad journal safety net. Kept small so generic papers do not dominate.
+# 7) Broad journal safety net. Deliberately tiny so generic papers cannot dominate.
 [[feeds]]
-name = "Broad Thermoelectric Journals"
+name = "Broad Thermoelectric Safety Net"
 source = "openalex"
 sort_by = "relevance"
 queries = [
@@ -197,4 +196,4 @@ exclude_keywords = [
   "spin Nernst"
 ]
 max_results = 100
-max_items = 10
+max_items = 5
