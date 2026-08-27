@@ -8,7 +8,7 @@ export const SCORE_WEIGHTS = {
   researcher: 30,
   priorityVenue: 12,
   strongEvidence: 10,
-  peripheral: -10,
+  peripheral: -15,
   exclude: -100,
 } as const;
 
