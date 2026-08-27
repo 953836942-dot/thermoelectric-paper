@@ -8,13 +8,11 @@
 
 # 1) High-priority journal discovery.
 # Stock paper-digest has no strict journal/source-name filter. This feed therefore
-# uses OpenAlex text queries containing journal names plus thermoelectric terms.
-# OpenAlex is used instead of Crossref here because its publication date is suitable
-# for the weekly lookback window; Crossref can surface old papers by re-index date.
-# Treat this as a high-priority discovery stream, not a guaranteed venue filter.
+# uses Semantic Scholar text queries containing journal names plus thermoelectric
+# terms. Treat it as a high-priority discovery stream, not a guaranteed venue filter.
 [[feeds]]
 name = "HIGH PRIORITY - High-impact Thermoelectrics"
-source = "openalex"
+source = "semantic_scholar"
 sort_by = "relevance"
 queries = [
   "thermoelectric Advanced Materials",
@@ -34,7 +32,7 @@ queries = [
   "thermoelectric Small",
   "thermoelectric Journal of Materials Chemistry A"
 ]
-types = ["article"]
+types = ["JournalArticle"]
 keywords = [
   "thermoelectric",
   "Seebeck coefficient",
