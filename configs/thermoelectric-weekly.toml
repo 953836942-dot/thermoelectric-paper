@@ -80,7 +80,8 @@ keywords = [
   "thermoelectric properties",
   "thermoelectric figure of merit",
   "Seebeck coefficient",
-  "thermoelectric power factor"
+  "thermoelectric power factor",
+  "zT"
 ]
 exclude_keywords = [
   "anomalous Nernst effect",
@@ -99,11 +100,10 @@ keywords = [
   "thermoelectric doping",
   "doped thermoelectric",
   "carrier concentration optimization",
-  "band convergence",
-  "resonant level",
+  "thermoelectric band convergence",
+  "resonant level thermoelectric",
   "weighted mobility",
   "thermoelectric quality factor",
-  "lattice thermal conductivity",
   "bipolar conduction"
 ]
 exclude_keywords = [
@@ -170,6 +170,8 @@ exclude_keywords = [
 max_results = 120
 max_items = 35
 
+# OpenAlex is restricted to article records; preprints are already covered by
+# arXiv, and excluding OpenAlex preprints avoids duplicate repository deposits.
 [[feeds]]
 name = "Thermoelectric Journals - OpenAlex"
 source = "openalex"
@@ -178,7 +180,7 @@ queries = [
   "thermoelectric doping",
   "thermoelectric machine learning"
 ]
-types = ["article", "preprint"]
+types = ["article"]
 keywords = [
   "thermoelectric",
   "Seebeck coefficient",
