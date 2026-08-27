@@ -2,7 +2,7 @@
   "version": 2,
   "description": "Thermoelectric screening rules for PaperEcho-TE.",
   "triage": {
-    "version": "2026-08-27-te-v2",
+    "version": "2026-08-27-te-v3",
     "legacy_biomedical_hard_excludes": false,
     "labels": {
       "A": "A - read first",
@@ -47,8 +47,10 @@
         "half-Heusler",
         "skutterudite",
         "co-doping",
+        "co‐doping",
+        "co–doping",
+        "co‑doping",
         "co doping",
-        "carrier concentration",
         "weighted mobility",
         "B factor",
         "quality factor",
@@ -71,6 +73,9 @@
         "bipolar transport",
         "alloying",
         "co-doping",
+        "co‐doping",
+        "co–doping",
+        "co‑doping",
         "co doping",
         "strain",
         "interface",
@@ -85,12 +90,13 @@
     "priority_rules": {
       "strongly_prioritize": [
         "Direct thermoelectric ML or composition-to-property prediction.",
-        "Co-doping or carrier-concentration optimization.",
+        "Co-doping or explicit carrier-concentration optimization.",
         "Weighted mobility, B factor, quality factor, band convergence, or resonant levels.",
         "Mechanism/performance work in GeTe, Bi2Te3, PbTe, SnSe, Ag2Se, Mg3Sb2, half-Heusler, or skutterudite systems."
       ],
       "downgrade": [
         "General thermoelectric mechanism work outside priority systems is normally B rather than A.",
+        "A generic mention of carrier concentration is not sufficient for A.",
         "Flexible/device work with little materials or transport optimization is normally C."
       ],
       "strict_exclude": [
@@ -136,7 +142,7 @@
       "positive_keyword_groups": {
         "thermoelectric": ["thermoelectric", "Seebeck", "power factor", "figure of merit", "zT"],
         "priority_materials": ["GeTe", "Bi2Te3", "PbTe", "SnSe", "Ag2Se", "Mg3Sb2", "half-Heusler", "skutterudite"],
-        "priority_optimization": ["co-doping", "carrier concentration", "band convergence", "weighted mobility", "B factor", "quality factor", "resonant level"],
+        "priority_optimization": ["co-doping", "co‐doping", "co–doping", "co‑doping", "band convergence", "weighted mobility", "B factor", "quality factor", "resonant level"],
         "ml": ["machine learning", "materials informatics", "composition-property", "property prediction"]
       },
       "negative_keywords": [
