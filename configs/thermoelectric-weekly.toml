@@ -130,7 +130,9 @@ exclude_keywords = ["tutorial"]
 max_results = 180
 max_items = 25
 
-# Flexible, printed, wearable, and module/device work.
+# Flexible, printed, wearable, generator, and module work. The generic
+# "thermoelectric device" phrase is intentionally omitted because it also
+# appears in otherwise general thermal-transport papers.
 [[feeds]]
 name = "Flexible and Thermoelectric Devices"
 source = "arxiv"
@@ -140,8 +142,7 @@ keywords = [
   "wearable thermoelectric",
   "printed thermoelectric",
   "thermoelectric generator",
-  "thermoelectric module",
-  "thermoelectric device"
+  "thermoelectric module"
 ]
 exclude_keywords = []
 max_results = 160
