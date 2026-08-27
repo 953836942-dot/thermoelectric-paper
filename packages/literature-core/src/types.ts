@@ -50,6 +50,22 @@ export interface ResearchConfig {
   peripheralTerms?: string[];
 }
 
+export type SearchQueryKind = "topic" | "material" | "mechanism" | "researcher" | "venue";
+
+export interface SearchQuery {
+  kind: SearchQueryKind;
+  query: string;
+  openalexAuthorId?: string;
+}
+
+export type ScheduleFrequency = "daily" | "weekly";
+
+export interface ScheduleConfig {
+  frequency: ScheduleFrequency;
+  time: string;
+  weekday?: number;
+}
+
 export interface MatchedSignals {
   topics: string[];
   priorityMaterials: string[];
