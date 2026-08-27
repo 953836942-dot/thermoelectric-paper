@@ -61,6 +61,8 @@ export function ResearchPage({ api }: ResearchPageProps) {
   }, [api]);
 
   if (!draft || !base) return <main class="dashboard-content"><p class="dashboard-status">Loading research settings…</p></main>;
+  const currentDraft = draft;
+  const currentBase = base;
 
   function update(field: keyof Draft, value: string) {
     setDraft(current => current ? { ...current, [field]: value } : current);
@@ -68,13 +70,13 @@ export function ResearchPage({ api }: ResearchPageProps) {
   }
 
   async function save() {
-    if (!split(draft.topics).length) {
+    if (!split(currentDraft.topics).length) {
       setStatus("Add at least one research topic.");
       return;
     }
     setSaving(true);
     try {
-      const profile = await api.updateProfile({ config: configFromDraft(draft, base) });
+      const profile = await api.updateProfile({ config: configFromDraft(currentDraft, currentBase) });
       setBase(profile.config);
       setDraft(draftFromConfig(profile.config));
       setStatus("Saved locally in this browser.");
@@ -115,7 +117,7 @@ export function ResearchPage({ api }: ResearchPageProps) {
           <label class="settings-card" key={field.key}>
             <span class="settings-label">{field.label}</span>
             <span class="settings-hint">{field.hint}</span>
-            <textarea value={draft[field.key]} onInput={event => update(field.key, (event.currentTarget as HTMLTextAreaElement).value)} rows={5} />
+            <textarea value={currentDraft[field.key]} onInput={event => update(field.key, (event.currentTarget as HTMLTextAreaElement).value)} rows={5} />
           </label>
         ))}
       </section>
