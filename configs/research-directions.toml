@@ -1,0 +1,199 @@
+# ============================================================
+# USER EDIT AREA: RESEARCH DIRECTIONS
+# Edit THIS file when you want to change topics, materials, or keywords.
+# Every [[feeds]] block is one literature stream.
+# After committing a change, GitHub Actions automatically runs a fresh_scan
+# validation without touching production history.
+# ============================================================
+
+# 1) High-priority journal discovery.
+# Stock paper-digest has no strict journal/source-name filter, so this feed uses
+# Crossref bibliographic queries containing journal names plus thermoelectric terms.
+# Treat it as a high-priority discovery stream, not a guaranteed venue filter.
+[[feeds]]
+name = "HIGH PRIORITY - High-impact Thermoelectrics"
+source = "crossref"
+sort_by = "relevance"
+queries = [
+  "thermoelectric Advanced Materials",
+  "thermoelectric Advanced Functional Materials",
+  "thermoelectric Advanced Energy Materials",
+  "thermoelectric Energy Environmental Science",
+  "thermoelectric Joule",
+  "thermoelectric Matter",
+  "thermoelectric ACS Energy Letters",
+  "thermoelectric Nature Communications",
+  "thermoelectric Science Advances",
+  "thermoelectric Nano Energy",
+  "thermoelectric Chemistry of Materials",
+  "thermoelectric Acta Materialia",
+  "thermoelectric Scripta Materialia",
+  "thermoelectric Small",
+  "thermoelectric Journal of Materials Chemistry A"
+]
+types = ["journal-article"]
+keywords = [
+  "thermoelectric",
+  "Seebeck coefficient",
+  "power factor",
+  "figure of merit",
+  "zT"
+]
+exclude_keywords = [
+  "anomalous Nernst effect",
+  "spin Nernst",
+  "spin caloritronics"
+]
+max_results = 80
+max_items = 20
+
+# 2) Doping optimization and transport physics.
+[[feeds]]
+name = "PRIORITY - Doping Optimization and Transport"
+source = "openalex"
+sort_by = "relevance"
+queries = [
+  "thermoelectric doping optimization",
+  "thermoelectric carrier concentration optimization",
+  "thermoelectric weighted mobility",
+  "thermoelectric quality factor",
+  "thermoelectric B factor",
+  "thermoelectric band convergence",
+  "thermoelectric resonant level",
+  "thermoelectric bipolar conduction"
+]
+types = ["article"]
+keywords = [
+  "thermoelectric",
+  "weighted mobility",
+  "quality factor",
+  "B factor",
+  "carrier concentration",
+  "band convergence",
+  "power factor",
+  "Seebeck coefficient",
+  "zT"
+]
+exclude_keywords = ["spin caloritronics", "anomalous Hall"]
+max_results = 100
+max_items = 20
+
+# 3) Machine learning, composition-to-property, and materials discovery.
+[[feeds]]
+name = "PRIORITY - Thermoelectric ML and Composition"
+source = "openalex"
+sort_by = "relevance"
+queries = [
+  "thermoelectric machine learning",
+  "thermoelectric materials informatics",
+  "thermoelectric composition property prediction",
+  "thermoelectric doping machine learning",
+  "thermoelectric materials discovery",
+  "thermoelectric screening composition"
+]
+types = ["article"]
+keywords = [
+  "thermoelectric",
+  "machine learning",
+  "materials informatics",
+  "composition",
+  "prediction",
+  "screening",
+  "materials discovery"
+]
+exclude_keywords = ["tutorial"]
+max_results = 100
+max_items = 20
+
+# 4) Priority thermoelectric material systems.
+# Add/remove material names here whenever your project focus changes.
+[[feeds]]
+name = "PRIORITY - Material Systems"
+source = "openalex"
+sort_by = "relevance"
+queries = [
+  "Bi2Te3 thermoelectric",
+  "GeTe thermoelectric",
+  "PbTe thermoelectric",
+  "SnSe thermoelectric",
+  "Ag2Se thermoelectric",
+  "Mg3Sb2 thermoelectric",
+  "half-Heusler thermoelectric",
+  "skutterudite thermoelectric"
+]
+types = ["article"]
+keywords = [
+  "thermoelectric",
+  "Seebeck coefficient",
+  "power factor",
+  "figure of merit",
+  "zT"
+]
+exclude_keywords = []
+max_results = 100
+max_items = 24
+
+# 5) Fresh preprints: broad but thermoelectric-specific.
+[[feeds]]
+name = "Fresh Thermoelectric Preprints"
+source = "arxiv"
+sort_by = "relevance"
+categories = ["cond-mat.mtrl-sci", "physics.app-ph"]
+keywords = [
+  "thermoelectric material",
+  "thermoelectric materials",
+  "thermoelectric performance",
+  "thermoelectric properties",
+  "thermoelectric figure of merit",
+  "Seebeck coefficient",
+  "thermoelectric power factor",
+  "zT"
+]
+exclude_keywords = [
+  "anomalous Nernst effect",
+  "spin Nernst",
+  "spin caloritronics"
+]
+max_results = 160
+max_items = 20
+
+# 6) Flexible / printed / wearable work is retained but deliberately lower-volume.
+[[feeds]]
+name = "Flexible and Thermoelectric Devices"
+source = "arxiv"
+sort_by = "relevance"
+categories = ["cond-mat.mtrl-sci", "physics.app-ph"]
+keywords = [
+  "flexible thermoelectric",
+  "wearable thermoelectric",
+  "printed thermoelectric",
+  "thermoelectric generator",
+  "thermoelectric module"
+]
+exclude_keywords = []
+max_results = 120
+max_items = 10
+
+# 7) Broad journal safety net. Kept smaller so generic papers do not dominate.
+[[feeds]]
+name = "Broad Thermoelectric Journals"
+source = "openalex"
+sort_by = "relevance"
+queries = [
+  "thermoelectric materials",
+  "thermoelectric performance",
+  "thermoelectric doping"
+]
+types = ["article"]
+keywords = [
+  "thermoelectric",
+  "Seebeck coefficient",
+  "thermoelectric power factor",
+  "thermoelectric figure of merit"
+]
+exclude_keywords = [
+  "anomalous Nernst effect",
+  "spin Nernst"
+]
+max_results = 100
+max_items = 15
