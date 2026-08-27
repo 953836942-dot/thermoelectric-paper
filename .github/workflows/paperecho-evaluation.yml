@@ -1,0 +1,24 @@
+name: PaperEcho Thermoelectric Evaluation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [paperecho-migration]
+    paths:
+      - 'tests/paperecho/**'
+      - 'scripts/paperecho/**'
+      - '.github/workflows/paperecho-evaluation.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  adapter-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run PaperEcho adapter tests
+        run: node --test tests/paperecho/*.test.mjs
