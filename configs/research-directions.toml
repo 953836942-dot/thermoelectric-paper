@@ -6,10 +6,107 @@
 # validation without touching production history.
 # ============================================================
 
-# 1) Performance engineering priority.
+# 1) Doping optimization and transport physics.
+[[feeds]]
+name = "PRIORITY - Doping Optimization and Transport"
+source = "openalex"
+sort_by = "relevance"
+queries = [
+  "thermoelectric doping optimization",
+  "thermoelectric carrier concentration optimization",
+  "thermoelectric weighted mobility",
+  "thermoelectric quality factor",
+  "thermoelectric B factor",
+  "thermoelectric band convergence",
+  "thermoelectric resonant level",
+  "thermoelectric bipolar conduction"
+]
+types = ["article"]
+keywords = [
+  "thermoelectric",
+  "weighted mobility",
+  "quality factor",
+  "B factor",
+  "carrier concentration",
+  "band convergence",
+  "power factor",
+  "Seebeck coefficient",
+  "zT"
+]
+exclude_keywords = [
+  "spin caloritronics",
+  "anomalous Hall",
+  "ion storage",
+  "battery",
+  "supercapacitor"
+]
+max_results = 100
+max_items = 20
+
+# 2) Machine learning, composition-to-property, and materials discovery.
+[[feeds]]
+name = "PRIORITY - Thermoelectric ML and Composition"
+source = "openalex"
+sort_by = "relevance"
+queries = [
+  "thermoelectric machine learning",
+  "thermoelectric materials informatics",
+  "thermoelectric composition property prediction",
+  "thermoelectric doping machine learning",
+  "thermoelectric materials discovery",
+  "thermoelectric screening composition"
+]
+types = ["article"]
+keywords = [
+  "thermoelectric",
+  "machine learning",
+  "materials informatics",
+  "composition",
+  "prediction",
+  "screening",
+  "materials discovery"
+]
+exclude_keywords = ["tutorial"]
+max_results = 100
+max_items = 20
+
+# 3) Priority thermoelectric material systems.
+# Add/remove material names here whenever your project focus changes.
+[[feeds]]
+name = "PRIORITY - Material Systems"
+source = "openalex"
+sort_by = "relevance"
+queries = [
+  "Bi2Te3 thermoelectric",
+  "GeTe thermoelectric",
+  "PbTe thermoelectric",
+  "SnSe thermoelectric",
+  "Ag2Se thermoelectric",
+  "Mg3Sb2 thermoelectric",
+  "half-Heusler thermoelectric",
+  "skutterudite thermoelectric"
+]
+types = ["article"]
+keywords = [
+  "thermoelectric",
+  "Seebeck coefficient",
+  "power factor",
+  "figure of merit",
+  "zT"
+]
+exclude_keywords = [
+  "ion storage",
+  "battery",
+  "supercapacitor"
+]
+max_results = 100
+max_items = 24
+
+# 4) Performance engineering priority.
 # Stock paper-digest 0.4.1 cannot reliably filter by journal venue from config.
-# This stream instead starts from current thermoelectric-performance papers and
-# retains papers using common high-value optimization/mechanism language.
+# This stream starts from current thermoelectric-performance papers and retains
+# common high-value optimization/mechanism language. In validation it surfaces
+# current papers from venues such as Science Advances, AFM, AEM and Small.
 [[feeds]]
 name = "PRIORITY - Performance Engineering"
 source = "openalex"
@@ -37,96 +134,17 @@ keywords = [
 exclude_keywords = [
   "anomalous Nernst effect",
   "spin Nernst",
-  "spin caloritronics"
+  "spin caloritronics",
+  "optoelectronics",
+  "photovoltaic",
+  "solar cell",
+  "ion storage",
+  "battery",
+  "supercapacitor",
+  "Li/Na/K ion storage"
 ]
 max_results = 120
-max_items = 12
-
-# 2) Doping optimization and transport physics.
-[[feeds]]
-name = "PRIORITY - Doping Optimization and Transport"
-source = "openalex"
-sort_by = "relevance"
-queries = [
-  "thermoelectric doping optimization",
-  "thermoelectric carrier concentration optimization",
-  "thermoelectric weighted mobility",
-  "thermoelectric quality factor",
-  "thermoelectric B factor",
-  "thermoelectric band convergence",
-  "thermoelectric resonant level",
-  "thermoelectric bipolar conduction"
-]
-types = ["article"]
-keywords = [
-  "thermoelectric",
-  "weighted mobility",
-  "quality factor",
-  "B factor",
-  "carrier concentration",
-  "band convergence",
-  "power factor",
-  "Seebeck coefficient",
-  "zT"
-]
-exclude_keywords = ["spin caloritronics", "anomalous Hall"]
-max_results = 100
-max_items = 20
-
-# 3) Machine learning, composition-to-property, and materials discovery.
-[[feeds]]
-name = "PRIORITY - Thermoelectric ML and Composition"
-source = "openalex"
-sort_by = "relevance"
-queries = [
-  "thermoelectric machine learning",
-  "thermoelectric materials informatics",
-  "thermoelectric composition property prediction",
-  "thermoelectric doping machine learning",
-  "thermoelectric materials discovery",
-  "thermoelectric screening composition"
-]
-types = ["article"]
-keywords = [
-  "thermoelectric",
-  "machine learning",
-  "materials informatics",
-  "composition",
-  "prediction",
-  "screening",
-  "materials discovery"
-]
-exclude_keywords = ["tutorial"]
-max_results = 100
-max_items = 20
-
-# 4) Priority thermoelectric material systems.
-# Add/remove material names here whenever your project focus changes.
-[[feeds]]
-name = "PRIORITY - Material Systems"
-source = "openalex"
-sort_by = "relevance"
-queries = [
-  "Bi2Te3 thermoelectric",
-  "GeTe thermoelectric",
-  "PbTe thermoelectric",
-  "SnSe thermoelectric",
-  "Ag2Se thermoelectric",
-  "Mg3Sb2 thermoelectric",
-  "half-Heusler thermoelectric",
-  "skutterudite thermoelectric"
-]
-types = ["article"]
-keywords = [
-  "thermoelectric",
-  "Seebeck coefficient",
-  "power factor",
-  "figure of merit",
-  "zT"
-]
-exclude_keywords = []
-max_results = 100
-max_items = 24
+max_items = 10
 
 # 5) Fresh preprints: broad but thermoelectric-specific.
 [[feeds]]
@@ -169,8 +187,8 @@ exclude_keywords = []
 max_results = 120
 max_items = 8
 
-# 7) Broad journal safety net. This stays last; it is deliberately not presented
-# as a quality-ranked venue list because stock config cannot filter venue reliably.
+# 7) Broad journal safety net. This stays last and is not presented as a
+# quality-ranked venue list because stock config cannot filter venue reliably.
 [[feeds]]
 name = "Broad Thermoelectric Safety Net"
 source = "openalex"
@@ -189,7 +207,10 @@ keywords = [
 ]
 exclude_keywords = [
   "anomalous Nernst effect",
-  "spin Nernst"
+  "spin Nernst",
+  "ion storage",
+  "battery",
+  "supercapacitor"
 ]
 max_results = 100
 max_items = 10
