@@ -53,3 +53,112 @@ jobs:
           PAPERECHO_ROOT: ${{ github.workspace }}/PaperEcho
         working-directory: control
         run: node --test tests/paperecho/classifier-behavior.test.mjs
+
+  seven-day-evaluation:
+    needs: [adapter-tests, classifier-integration]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout thermoelectric control repository
+        uses: actions/checkout@v5
+        with:
+          path: control
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Checkout pinned stock paper-digest
+        uses: actions/checkout@v5
+        with:
+          repository: X-PG13/paper-digest
+          ref: 8906f9a12309956913eab29dade75c01cb7d0771
+          path: paper-digest
+
+      - name: Install stock paper-digest
+        run: python -m pip install ./paper-digest
+
+      - name: Materialize current thermoelectric fresh-scan config
+        run: |
+          cat control/configs/base.toml control/configs/research-directions.toml control/configs/researchers.toml > paper-digest/config.toml
+
+      - name: Collect same 7-day candidate set with stock paper-digest
+        working-directory: paper-digest
+        run: python -m paper_digest --config config.toml
+
+      - name: Convert paper-digest candidates to PaperEcho Local input
+        run: |
+          mkdir -p evaluation
+          node control/scripts/paperecho/convert-paper-digest.mjs paper-digest/output/latest.json evaluation/candidates.json
+          node -e "const a=require('./evaluation/candidates.json'); console.log('CANDIDATE_COUNT='+a.length); if(!a.length) process.exit(1)"
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Checkout pinned stock PaperEcho
+        uses: actions/checkout@v5
+        with:
+          repository: Chip-G0202/PaperEcho
+          ref: 87a49927306e347553e74b5fbc7b48de8ca09055
+          path: PaperEcho
+
+      - name: Install stock PaperEcho dependencies
+        working-directory: PaperEcho
+        run: npm ci
+
+      - name: Install thermoelectric PaperEcho configuration
+        run: |
+          cp control/paperecho-config/source_selection.json PaperEcho/config/source_selection.json
+          cp control/paperecho-config/openalex_search.json PaperEcho/config/openalex_search.json
+          cp control/paperecho-config/rss_sources.json PaperEcho/config/rss_sources.json
+          cp control/paperecho-config/pubmed_pmc_search.json PaperEcho/config/pubmed_pmc_search.json
+          cp control/paperecho-config/review-workflow-rules.json PaperEcho/config/review-workflow-rules.json
+          cp control/paperecho-config/paperecho.local.config.json PaperEcho/config/paperecho.config.json
+
+      - name: Apply minimal PaperEcho-TE classifier patch
+        run: node control/paperecho-patch/apply-te-classifier-patch.mjs PaperEcho/workflow/tools/stage1/rule_classifier.mjs
+
+      - name: PaperEcho Local preflight
+        working-directory: PaperEcho
+        run: >-
+          node skills/paperecho-local/scripts/run.mjs --check
+          --config config/paperecho.config.json
+          --input ../evaluation/candidates.json
+          --output-root ../evaluation/paperecho-output
+
+      - name: Run official PaperEcho Local workflow
+        working-directory: PaperEcho
+        run: >-
+          node skills/paperecho-local/scripts/run.mjs --run
+          --config config/paperecho.config.json
+          --input ../evaluation/candidates.json
+          --output-root ../evaluation/paperecho-output
+
+      - name: Build side-by-side comparison
+        run: |
+          node control/scripts/paperecho/compare-results.mjs paper-digest/output/latest.json evaluation/paperecho-output/state/papers.json evaluation
+          cat evaluation/comparison.md
+
+      - name: Verify required evaluation outputs
+        run: |
+          test -s evaluation/comparison.md
+          test -s evaluation/comparison.json
+          test -s evaluation/paperecho-output/state/papers.json
+          find evaluation/paperecho-output/exports -type f -name '*.xlsx' -print -quit | grep -q .
+
+      - name: Upload complete evaluation artifact
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: paperecho-evaluation-${{ github.run_number }}
+          retention-days: 90
+          if-no-files-found: warn
+          path: |
+            paper-digest/output/
+            evaluation/candidates.json
+            evaluation/paperecho-output/
+            evaluation/comparison.json
+            evaluation/comparison.md
