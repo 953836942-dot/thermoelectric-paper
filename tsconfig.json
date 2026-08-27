@@ -2,6 +2,7 @@
   "files": [],
   "references": [
     { "path": "./packages/literature-core" },
-    { "path": "./apps/worker" }
+    { "path": "./apps/worker" },
+    { "path": "./apps/extension" }
   ]
 }
