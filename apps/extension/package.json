@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "vitest run",
+    "test": "vitest run --config vitest.config.ts",
     "typecheck": "tsc -b",
     "build": "vite build"
   },
@@ -12,6 +12,9 @@
     "preact": "^10.27.0"
   },
   "devDependencies": {
+    "@testing-library/preact": "*",
+    "@testing-library/user-event": "*",
+    "jsdom": "*",
     "vite": "^7.1.0"
   }
 }
