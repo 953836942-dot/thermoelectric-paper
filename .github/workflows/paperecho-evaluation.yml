@@ -5,6 +5,7 @@ on:
   push:
     branches: [paperecho-migration]
     paths:
+      - 'README.md'
       - 'tests/paperecho/**'
       - 'scripts/paperecho/**'
       - 'paperecho-config/**'
