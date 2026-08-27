@@ -1,5 +1,6 @@
-import { env, exports } from "cloudflare:workers";
+import { env } from "cloudflare:workers";
 import { describe, expect, it } from "vitest";
+import worker from "../src/index";
 
 type CreatedProfile = {
   profile_id: string;
@@ -12,8 +13,12 @@ type CreatedProfile = {
   };
 };
 
+async function request(path: string, init?: RequestInit): Promise<Response> {
+  return worker.fetch(new Request(`https://example.com${path}`, init), env);
+}
+
 async function createProfile(body?: object): Promise<CreatedProfile> {
-  const response = await exports.default.fetch("https://example.com/v1/profile", {
+  const response = await request("/v1/profile", {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: body ? JSON.stringify(body) : undefined
@@ -47,15 +52,13 @@ describe("profile API", () => {
   });
 
   it("rejects profile reads without a bearer key", async () => {
-    const response = await exports.default.fetch("https://example.com/v1/profile");
+    const response = await request("/v1/profile");
     expect(response.status).toBe(401);
   });
 
   it("authenticates a created profile with its recovery key", async () => {
     const created = await createProfile();
-    const response = await exports.default.fetch("https://example.com/v1/profile", {
-      headers: auth(created.recovery_key)
-    });
+    const response = await request("/v1/profile", { headers: auth(created.recovery_key) });
     expect(response.status).toBe(200);
     const body = await response.json() as { profile_id: string };
     expect(body.profile_id).toBe(created.profile_id);
@@ -63,7 +66,7 @@ describe("profile API", () => {
 
   it("rejects invalid timezone updates", async () => {
     const created = await createProfile();
-    const response = await exports.default.fetch("https://example.com/v1/profile", {
+    const response = await request("/v1/profile", {
       method: "PUT",
       headers: auth(created.recovery_key),
       body: JSON.stringify({ timezone: "Mars/Olympus" })
@@ -73,7 +76,7 @@ describe("profile API", () => {
 
   it("rejects researchers without both name and OpenAlex ID", async () => {
     const created = await createProfile();
-    const response = await exports.default.fetch("https://example.com/v1/profile", {
+    const response = await request("/v1/profile", {
       method: "PUT",
       headers: auth(created.recovery_key),
       body: JSON.stringify({ config: { researchers: [{ name: "Jane Doe" }] } })
