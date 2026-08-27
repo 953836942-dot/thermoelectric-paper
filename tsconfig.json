@@ -1,0 +1,6 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/literature-core" }
+  ]
+}

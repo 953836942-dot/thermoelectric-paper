@@ -1,0 +1,29 @@
+{
+  "config": {
+    "topics": ["thermoelectric"],
+    "priorityMaterials": ["GeTe", "Bi2Te3", "PbTe", "SnSe", "Ag2Se", "Mg3Sb2", "half-Heusler", "skutterudite"],
+    "mechanisms": ["co-doping", "band engineering", "strain engineering", "interface engineering", "bipolar transport", "alloying"],
+    "excludedTopics": ["photodetector", "battery", "photovoltaic"],
+    "priorityVenues": [],
+    "researchers": [],
+    "peripheralTerms": ["flexible"]
+  },
+  "papers": [
+    {"title":"Enhanced Thermoelectric Performance in Se Alloyed SnS Through Band Engineering, Na and Ag Co‐Doping, and Nanostructuring","abstract":"SnS thermoelectric performance improved by band engineering and Na/Ag co-doping.","doi":"10.1000/sns","publicationDate":"2026-08-24","url":"https://doi.org/10.1000/sns","expectedGrade":"A"},
+    {"title":"Interface‐Engineered Boosting of Phase Stability and Thermoelectric Performance of Ag 2 Se","abstract":"Ag2Se thermoelectric performance and phase stability are improved through interface engineering.","doi":"10.1000/ag2se","publicationDate":"2026-08-24","url":"https://doi.org/10.1000/ag2se","expectedGrade":"A"},
+    {"title":"Multi‐Scale Lattice Strain Engineering Enables Reduced Deformation Potential and High Thermoelectric Performance in GeTe Alloys","abstract":"GeTe thermoelectric performance is optimized through strain engineering.","doi":"10.1000/gete","publicationDate":"2026-08-24","url":"https://doi.org/10.1000/gete","expectedGrade":"A"},
+    {"title":"Interplay between anharmonic lattice dynamics and bipolar-transport-driven anomalous transport in Zintl phase K X Sb ( X = Ge , Sn , Pb )","abstract":"Thermoelectric performance, bipolar transport, quality factor and lattice transport are analyzed.","doi":"10.1103/j8lq-zvhf","publicationDate":"2026-08-24","url":"https://doi.org/10.1103/j8lq-zvhf","expectedGrade":"A"},
+    {"title":"The regulation mechanism of Bi alloying on the electronic and phonon properties of Mg3Sb2 thermoelectric materials","abstract":"Mg3Sb2 thermoelectric properties are regulated by Bi alloying and phonon transport.","doi":"10.1016/j.ssc.2026.116569","publicationDate":"2026-08-23","url":"https://doi.org/10.1016/j.ssc.2026.116569","expectedGrade":"A"},
+    {"title":"Regulating phonon-carrier transport by interfacial symmetry breaking in thermoelectric multilayers","abstract":"Bi2Te3 thermoelectric multilayers use interface engineering to regulate phonon and carrier transport.","doi":"10.1126/sciadv.aeh5460","publicationDate":"2026-08-21","url":"https://doi.org/10.1126/sciadv.aeh5460","expectedGrade":"A"},
+    {"title":"Engineering phase evolution and carrier transport in RF-sputtered Cu2NiSnS4 thin films via CTS/Ni multilayers for enhanced thermoelectric performance","abstract":"Thermoelectric performance and carrier transport in Cu2NiSnS4 thin films.","doi":"10.1000/cu2nisns4","publicationDate":"2026-08-23","url":"https://doi.org/10.1000/cu2nisns4","expectedGrade":"B"},
+    {"title":"Off-stoichiometric variable doping for exceptional power factors in L2_1 Fe2VAlMx (M=Ti, W) epitaxial thin films","abstract":"Thermoelectric power factor and transport are improved through variable doping.","doi":"10.1000/fe2val","publicationDate":"2026-08-22","url":"https://doi.org/10.1000/fe2val","expectedGrade":"B"},
+    {"title":"Successful growth of molybdenum trioxide (a-MoO3) nanostructures by thermal evaporation method for thermoelectricity production","abstract":"Thermoelectric properties of molybdenum trioxide nanostructures are evaluated.","doi":"10.1000/moo3","publicationDate":"2026-08-22","url":"https://doi.org/10.1000/moo3","expectedGrade":"B"},
+    {"title":"Predicted High n-Type zT and Ultralow Lattice Thermal Conductivity in A2AgIrCl6 (A = Cs, Rb)","abstract":"Thermoelectric performance and transport are predicted for A2AgIrCl6.","arxivId":"2608.12345","publicationDate":"2026-08-22","url":"https://arxiv.org/abs/2608.12345","expectedGrade":"B"},
+    {"title":"Indium tin oxide thin films for textile-based thermoelectric devices","abstract":"Thermoelectric thin films are investigated for textile devices.","doi":"10.1000/ito","publicationDate":"2026-08-22","url":"https://doi.org/10.1000/ito","expectedGrade":"B"},
+    {"title":"Effects of Sn Doping on Charge Transport and Thermoelectric Performance of Wittichenite","abstract":"Thermoelectric performance and charge transport respond to Sn doping.","doi":"10.1000/wittichenite","publicationDate":"2026-08-21","url":"https://doi.org/10.1000/wittichenite","expectedGrade":"B"},
+    {"title":"Strong anharmonicity driven wave-like thermal transport and high thermoelectric performance in TlCu 5 Se 3","abstract":"Thermoelectric performance and thermal transport are linked to strong anharmonicity.","doi":"10.1000/tlcu5se3","publicationDate":"2026-08-21","url":"https://doi.org/10.1000/tlcu5se3","expectedGrade":"B"},
+    {"title":"Dual-doped all-graphene fiber for flexible, high-performance thermoelectric temperature sensing","abstract":"Flexible thermoelectric temperature sensing with graphene fibers.","doi":"10.1000/graphene","publicationDate":"2026-08-21","url":"https://doi.org/10.1000/graphene","expectedGrade":"C"},
+    {"title":"Free-standing highly conductive PEDOT-NW/MoS2 composite films for flexible thermoelectric generators","abstract":"Flexible thermoelectric generators based on PEDOT-NW/MoS2 composite films.","doi":"10.1000/pedot","publicationDate":"2026-08-21","url":"https://doi.org/10.1000/pedot","expectedGrade":"C"},
+    {"title":"Flexible Bi 2 Te 3 Photothermoelectric Position‐Sensitive Detector","abstract":"A flexible Bi2Te3 photodetector uses a photothermoelectric response.","doi":"10.1000/detector","publicationDate":"2026-08-21","url":"https://doi.org/10.1000/detector","expectedGrade":"D"}
+  ]
+}
