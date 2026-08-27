@@ -117,55 +117,81 @@ async function readJsonBody(request: Request): Promise<Record<string, unknown>> 
   }
 }
 
+function asApiError(error: unknown): { status: number; message: string } | null {
+  if (!error || typeof error !== "object") return null;
+  const candidate = error as { status?: unknown; message?: unknown };
+  if (typeof candidate.status !== "number" || candidate.status < 400 || candidate.status > 599) return null;
+  return {
+    status: candidate.status,
+    message: typeof candidate.message === "string" ? candidate.message : "Request failed",
+  };
+}
+
+async function handleExpectedErrors(work: () => Promise<Response>): Promise<Response> {
+  try {
+    return await work();
+  } catch (error) {
+    const mapped = asApiError(error);
+    if (mapped) return Response.json({ error: mapped.message }, { status: mapped.status });
+    throw error;
+  }
+}
+
 export async function createProfile(request: Request, env: Env): Promise<Response> {
-  const body = await readJsonBody(request);
-  if (body.template !== undefined && body.template !== "thermoelectric") throw new ApiError(400, "Unknown template");
+  return handleExpectedErrors(async () => {
+    const body = await readJsonBody(request);
+    if (body.template !== undefined && body.template !== "thermoelectric") throw new ApiError(400, "Unknown template");
 
-  const isThermoelectric = body.template === "thermoelectric";
-  const config = isThermoelectric ? thermoelectricConfig() : emptyConfig();
-  const timezone = isThermoelectric ? "Australia/Brisbane" : "UTC";
-  const schedule: ScheduleConfig = { frequency: "weekly", weekday: 1, time: "08:00" };
-  const now = new Date();
-  const profileId = crypto.randomUUID();
-  const recoveryKey = generateRecoveryKey();
-  const tokenHash = await sha256Hex(recoveryKey);
-  const nextRunAt = computeNextRun(now, timezone, schedule).toISOString();
-  const timestamp = now.toISOString();
+    const isThermoelectric = body.template === "thermoelectric";
+    const config = isThermoelectric ? thermoelectricConfig() : emptyConfig();
+    const timezone = isThermoelectric ? "Australia/Brisbane" : "UTC";
+    const schedule: ScheduleConfig = { frequency: "weekly", weekday: 1, time: "08:00" };
+    const now = new Date();
+    const profileId = crypto.randomUUID();
+    const recoveryKey = generateRecoveryKey();
+    const tokenHash = await sha256Hex(recoveryKey);
+    const nextRunAt = computeNextRun(now, timezone, schedule).toISOString();
+    const timestamp = now.toISOString();
 
-  await env.DB.prepare(
-    `INSERT INTO profiles (profile_id, token_hash, config_json, timezone, schedule_json, enabled, next_run_at, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?)`
-  ).bind(profileId, tokenHash, JSON.stringify(config), timezone, JSON.stringify(schedule), nextRunAt, timestamp, timestamp).run();
+    await env.DB.prepare(
+      `INSERT INTO profiles (profile_id, token_hash, config_json, timezone, schedule_json, enabled, next_run_at, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?)`
+    ).bind(profileId, tokenHash, JSON.stringify(config), timezone, JSON.stringify(schedule), nextRunAt, timestamp, timestamp).run();
 
-  const row = await getProfileRow(env, profileId);
-  if (!row) throw new Error("Profile insert failed");
-  return Response.json({ profile_id: profileId, recovery_key: recoveryKey, profile: rowToProfile(row) }, { status: 201 });
+    const row = await getProfileRow(env, profileId);
+    if (!row) throw new Error("Profile insert failed");
+    return Response.json({ profile_id: profileId, recovery_key: recoveryKey, profile: rowToProfile(row) }, { status: 201 });
+  });
 }
 
 export async function getProfile(env: Env, profileId: string): Promise<Response> {
-  const row = await getProfileRow(env, profileId);
-  if (!row) throw new ApiError(404, "Profile not found");
-  return Response.json(rowToProfile(row));
+  return handleExpectedErrors(async () => {
+    const row = await getProfileRow(env, profileId);
+    if (!row) throw new ApiError(404, "Profile not found");
+    return Response.json(rowToProfile(row));
+  });
 }
 
 export async function updateProfile(request: Request, env: Env, profileId: string): Promise<Response> {
-  const row = await getProfileRow(env, profileId);
-  if (!row) throw new ApiError(404, "Profile not found");
-  const current = rowToProfile(row);
-  const body = await readJsonBody(request);
-  const config = body.config === undefined ? current.config : validateConfig(current.config, body.config);
-  const timezone = body.timezone === undefined ? current.timezone : validateTimezone(body.timezone);
-  const schedule = body.schedule === undefined ? current.schedule : validateSchedule(body.schedule);
-  const enabled = body.enabled === undefined ? current.enabled : body.enabled;
-  if (typeof enabled !== "boolean") throw new ApiError(400, "Invalid enabled value");
+  return handleExpectedErrors(async () => {
+    const row = await getProfileRow(env, profileId);
+    if (!row) throw new ApiError(404, "Profile not found");
+    const current = rowToProfile(row);
+    const body = await readJsonBody(request);
+    const config = body.config === undefined ? current.config : validateConfig(current.config, body.config);
+    const timezone = body.timezone === undefined ? current.timezone : validateTimezone(body.timezone);
+    const schedule = body.schedule === undefined ? current.schedule : validateSchedule(body.schedule);
+    const enabled = body.enabled === undefined ? current.enabled : body.enabled;
+    if (typeof enabled !== "boolean") throw new ApiError(400, "Invalid enabled value");
 
-  const now = new Date();
-  const nextRunAt = enabled ? computeNextRun(now, timezone, schedule).toISOString() : null;
-  await env.DB.prepare(
-    `UPDATE profiles SET config_json = ?, timezone = ?, schedule_json = ?, enabled = ?, next_run_at = ?, updated_at = ? WHERE profile_id = ?`
-  ).bind(JSON.stringify(config), timezone, JSON.stringify(schedule), enabled ? 1 : 0, nextRunAt, now.toISOString(), profileId).run();
+    const now = new Date();
+    const nextRunAt = enabled ? computeNextRun(now, timezone, schedule).toISOString() : null;
+    await env.DB.prepare(
+      `UPDATE profiles SET config_json = ?, timezone = ?, schedule_json = ?, enabled = ?, next_run_at = ?, updated_at = ? WHERE profile_id = ?`
+    ).bind(JSON.stringify(config), timezone, JSON.stringify(schedule), enabled ? 1 : 0, nextRunAt, now.toISOString(), profileId).run();
 
-  const updated = await getProfileRow(env, profileId);
-  if (!updated) throw new Error("Profile update failed");
-  return Response.json(rowToProfile(updated));
+    const updated = await getProfileRow(env, profileId);
+    if (!updated) throw new Error("Profile update failed");
+    return Response.json(rowToProfile(updated));
+  });
 }
