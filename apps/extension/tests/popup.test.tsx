@@ -62,14 +62,14 @@ describe("Popup", () => {
     const user = userEvent.setup();
     render(<Popup api={api} openDashboard={() => undefined} />);
 
-    const button = await screen.findByRole("button", { name: /search now/i });
+    const button = await screen.findByRole("button", { name: /search now/i }) as HTMLButtonElement;
     await user.click(button);
     expect(api.searchNow).toHaveBeenCalledTimes(1);
-    expect(button).toBeDisabled();
+    expect(button.disabled).toBe(true);
     expect(screen.getByText(/Searching/i)).toBeTruthy();
 
     resolveSearch();
     await waitFor(() => expect(api.getLatestReport).toHaveBeenCalledTimes(2));
-    expect(button).not.toBeDisabled();
+    expect(button.disabled).toBe(false);
   });
 });
