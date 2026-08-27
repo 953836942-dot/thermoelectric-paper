@@ -1,8 +1,10 @@
-import { render, screen, waitFor } from "@testing-library/preact";
+import { cleanup, render, screen, waitFor } from "@testing-library/preact";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { LatestReport, PaperView } from "../src/api/types";
 import { Popup } from "../src/popup/Popup";
+
+afterEach(() => cleanup());
 
 function paper(index: number): PaperView {
   return {
