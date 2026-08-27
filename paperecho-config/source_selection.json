@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "description": "Thermoelectric source policy for PaperEcho-TE.",
+  "research_domain": "non_biomedical_stem",
+  "domain_options": {
+    "biomedical": {"label": "biomedical", "primary_sources": ["pubmed_pmc"], "supplemental_sources": ["rss"], "notes": "unused"},
+    "non_biomedical_stem": {"label": "materials / physics / engineering", "primary_sources": ["openalex"], "supplemental_sources": ["rss"], "notes": "thermoelectric default"},
+    "education_social_science": {"label": "social science", "primary_sources": ["openalex"], "supplemental_sources": ["rss"], "notes": "unused"},
+    "mixed_biomedical_technical": {"label": "mixed", "primary_sources": ["pubmed_pmc", "openalex"], "supplemental_sources": ["rss"], "notes": "unused"},
+    "unknown": {"label": "unknown", "primary_sources": [], "supplemental_sources": ["rss"], "notes": "unused"}
+  },
+  "override_enabled_sources": null,
+  "require_manual_confirmation": false,
+  "notes": "OpenAlex primary, RSS supplemental for future production."
+}

@@ -1,124 +1,106 @@
-# Thermoelectric Paper Digest
+# Thermoelectric Literature Monitor
 
-This repository runs the **stock upstream `X-PG13/paper-digest`** for thermoelectric literature monitoring.
+推荐使用 **PaperEcho Thermoelectric Weekly**。它每周自动抓取最近 7 天热电文献，再用 PaperEcho-TE 做 A/B/C/D 分级，并生成一个可以直接双击打开的网页周报。
 
-The paper-digest source code is **not modified** here. GitHub Actions checks out a pinned upstream commit and combines repository-side configuration files at runtime.
+旧的 **Thermoelectric Paper Digest Weekly** 和 stock smoke test 仍保留作备用，不需要删除。
 
-## 最简单的使用方法
+## 最简单：怎么跑
 
-正常情况下你什么都不用做：它会在每周一大约 **08:07 Australia/Brisbane** 自动运行。
+正常情况下不用手动操作：系统会在每周一约 **08:07 Australia/Brisbane** 自动运行。
 
-如果你想现在手动跑一次：
+想现在跑一次：
 
-1. 打开仓库顶部的 **Actions**。
-2. 左侧点击 **Thermoelectric Paper Digest Weekly**。
+1. 打开仓库顶部 **Actions**。
+2. 左侧点击 **PaperEcho Thermoelectric Weekly**。
 3. 点击右上角 **Run workflow**。
-4. `Use workflow from` 保持 **main**。历史记录旁边那些 `main` 只是分支标签，不需要点。
-5. 在 `Run mode` 里选择：
-   - **production**：正式运行。读取并保存历史状态，自动去掉以前已经看过的论文。平时手动运行选这个。
-   - **fresh_scan**：测试运行。忽略历史，重新扫描最近 7 天；不会写入正式历史。改关键词后想看看效果时选这个。
-6. 点击绿色 **Run workflow**。
-7. 等待运行变成绿色 ✅，点开这次 run 的**黑色粗体标题**，不是点绿色勾。
-8. 页面底部找到 **Artifacts**，下载 `thermoelectric-paper-digest-...`。
+4. `Use workflow from` 保持 **main**。
+5. 点击绿色 **Run workflow**。
+6. 等最新运行变成绿色 ✅。
+7. 点击这条运行的**黑色粗体标题**进入，不需要点绿色勾。
+8. 滚到页面最下面 **Artifacts**。
+9. 下载 `paperecho-te-weekly-...`。
+10. 解压后直接双击 **`index.html`**。
 
-Artifact 解压后，GitHub 会直接把 `output/` 里面的内容放到根目录，所以通常直接看到：
+没有 production / fresh_scan 选择。每次都扫描最近 7 天，因此手动运行也只有一个按钮。
 
-- `index.html` — **最方便，双击直接看网页版**。
-- `latest.md` — 本次 Markdown 周报。
-- `latest.json` — 原始结构化数据。
-- `weekly-review.html` / `reading-list.html` / `trends.html` — 历史与反馈相关页面。
+## 下载后看什么
 
-## 在哪里改研究方向
+Artifact 根目录直接包含：
 
-从仓库首页开始：
+- **`index.html`** — 推荐先看；网页版周报，最上面直接是 `Top papers this week`。
+- **`周报.xlsx`** — PaperEcho 生成的 Excel 周报；有论文时生成。
+- `comparison.md` — A/B/C/D 标题清单。
+- `report.json` — 网页周报的结构化数据。
+- `papers.json` — PaperEcho 每篇论文的完整分级结果。
+- `source-digest.md` — 候选抓取层的原始 Markdown，主要用于核对漏检。
 
-**Code → configs → research-directions.toml → 右上角铅笔图标 Edit this file**
+## A / B / C / D 是什么
 
-这个文件顶部已经写着 `USER EDIT AREA: RESEARCH DIRECTIONS`，就是专门给你改的。当前分组为：
+- **A — Read first / 必看**：你的重点材料体系或核心优化问题，并且有明确机制/性能内容。
+- **B — Strong relevance / 很相关**：高相关热电材料、输运和性能工作，但不是当前最优先方向。
+- **C — Broad relevance / 背景参考**：仍属于热电，但更偏器件、柔性传感或与你当前问题距离较远。
+- **D — Out of scope / 排除**：battery、photovoltaic、photodetector、spin/anomalous Nernst 等已知误报方向。
 
-- `PRIORITY - Doping Optimization and Transport`
-- `PRIORITY - Thermoelectric ML and Composition`
-- `PRIORITY - Material Systems`
-- `PRIORITY - Performance Engineering`
-- `Fresh Thermoelectric Preprints`
-- `Flexible and Thermoelectric Devices`
-- `Broad Thermoelectric Safety Net`
-
-目前重点覆盖：
+A 档目前重点考虑：
 
 - thermoelectric ML / materials informatics
 - composition → property prediction
-- doping optimization
-- carrier concentration optimization
-- weighted mobility / quality factor / B factor
-- band convergence / resonant level / bipolar conduction
-- Bi2Te3 / GeTe / PbTe / SnSe / Ag2Se / Mg3Sb2 / half-Heusler / skutterudite
-- alloying / co-doping / interface engineering / strain engineering / band engineering / carrier transport / phonon engineering / nanostructuring
+- co-doping / doping optimization
+- weighted mobility / B factor / quality factor
+- band convergence / resonant level
+- GeTe / Bi2Te3 / PbTe / SnSe / Ag2Se / Mg3Sb2 / half-Heusler / skutterudite
 
-想加新方向时，在对应 `queries = [...]` 或 `keywords = [...]` 里增加一行即可。提交后 GitHub 自动跑一次 **fresh_scan** 检查效果，不污染正式历史。
+PaperEcho 原版里对材料学不合适的 biomedical hard-exclude 已通过一个最小仓库侧 patch 关闭；其他 PaperEcho Local 流程保持固定上游版本运行。
+
+## 在哪里改研究方向
+
+从仓库首页：
+
+**Code → configs → `research-directions.toml` → 右上角铅笔 Edit this file**
+
+这个文件顶部写着 `USER EDIT AREA: RESEARCH DIRECTIONS`。目前已经分成：
+
+- Doping Optimization and Transport
+- Thermoelectric ML and Composition
+- Material Systems
+- Performance Engineering
+- Fresh Thermoelectric Preprints
+- Flexible and Thermoelectric Devices
+- Broad Thermoelectric Safety Net
+
+想增加新方向，只需要在对应 `queries = [...]` 或 `keywords = [...]` 中增加一项并 Commit。
 
 ## 在哪里加关注研究者
 
-从仓库首页开始：
+从仓库首页：
 
-**Code → configs → researchers.toml → 右上角铅笔图标 Edit this file**
+**Code → configs → `researchers.toml` → 右上角铅笔 Edit this file**
 
-这个文件顶部写着 `USER EDIT AREA: RESEARCHER WATCHLIST`，里面有一个完整的注释模板：
+文件顶部有 `USER EDIT AREA: RESEARCHER WATCHLIST` 模板。复制模板、去掉 `#`、把 `Full Name` 改成研究者姓名即可。
 
-1. 复制模板 block。
-2. 删除复制内容每行前面的 `#`。
-3. 把 `Full Name` 替换成研究者真实姓名。
-4. 点 **Commit changes**。
-5. GitHub 会自动 fresh-scan 验证。
+目前研究者发现使用 OpenAlex 的“姓名 + thermoelectric / Seebeck”文本查询。因为 stock paper-digest 0.4.1 没有严格 author-ID 字段，所以它适合发现研究者相关新论文，但不能承诺 100% 身份消歧。
 
-注意：stock paper-digest 0.4.1 **没有严格 author-ID 过滤字段**。目前研究者监控使用 OpenAlex 的“研究者姓名 + thermoelectric / Seebeck”文本查询，是研究发现功能，不保证 100% 作者身份匹配。
+## 在哪里改 A/B/C/D 规则
 
-## 关于“高质量期刊优先”
+**Code → paperecho-config → `review-workflow-rules.json`**
 
-我们实际测试过 Crossref、OpenAlex 和 Semantic Scholar 的“期刊名 + thermoelectric”stock 配置方案：
+这里控制重点材料、核心机制、A/B/C/D 定义和 D 级排除词。当前规则是确定性的，不会在后台自己修改。
 
-- Crossref 会把部分旧论文因为重新索引时间带进本周结果，容易造成假新文献。
-- OpenAlex / Semantic Scholar 的普通文本查询不能可靠把期刊名称当作严格 venue filter。
+## 当前技术路线
 
-因此当前**没有伪装成严格期刊过滤**。在不修改 paper-digest 源码的前提下，正式方案优先按研究价值筛：掺杂优化、材料体系、高性能改善和关键输运机制，再把 broad safety-net 放最后。
+当前稳定版本采用：
 
-当前 fresh validation 已经能把本周较强的工作拉到 priority streams，例如 Science Advances、Small、Advanced Functional Materials、Advanced Energy Materials 的热电工作，同时过滤了已观察到的 optoelectronics / battery 等明显非热电误报。
+**stock paper-digest（最近 7 天候选抓取） → PaperEcho-TE（去重/规则分级/周报） → `index.html` + `周报.xlsx`**
 
-如果以后明确允许增加一个仓库侧预处理层或修改上游逻辑，才适合做真正的 venue whitelist / journal quality score。
+这么做是因为 PaperEcho Local 本身接受 JSON/JSONL 输入但不负责在线检索；PaperEcho 完整 Web/Zotero 检索路径需要额外的 Zotero API 配置。现在这条路线不需要 API key、不需要付费 LLM，也不需要你的电脑一直开着。
 
-## 自动运行与两种模式
+固定版本：
 
-Workflow: `.github/workflows/thermoelectric-weekly.yml`
+- paper-digest: `8906f9a12309956913eab29dade75c01cb7d0771`
+- PaperEcho: `87a49927306e347553e74b5fbc7b48de8ca09055`
 
-Schedule: every Monday at about **08:07 Australia/Brisbane** (GitHub cron `22:07 UTC` on Sunday).
+## 备用 workflow
 
-行为规则：
-
-- **Scheduled Monday run** → production，使用历史去重并保存新的历史。
-- **Manual + production** → 与正式周报相同，使用并更新历史。
-- **Manual + fresh_scan** → 无状态扫描，不读取或污染 production cache。
-- **修改 `base.toml` / `research-directions.toml` / `researchers.toml` / workflow 后** → 自动 fresh validation，不污染正式历史。
-
-Runtime 会自动拼接：
-
-1. `configs/base.toml`
-2. `configs/research-directions.toml`
-3. `configs/researchers.toml`
-
-生成 paper-digest 实际读取的 `config.toml`。
-
-## 为什么周度回顾 / 阅读清单现在可能是 0
-
-这些页面依赖 production 历史和 feedback 状态。刚部署时，如果还没有长期 production run，或者还没有给论文标记 `star / follow_up / reading / done / ignore`，这些页面显示 0 是正常的。
-
-## Stock smoke test
-
-早期的 **Paper Digest Thermoelectric Stock Smoke** workflow 保留作为最小基准测试。日常使用不需要点它，平时只用 **Thermoelectric Paper Digest Weekly**。
-
-## Upstream pin
-
-Production workflow pins the upstream paper-digest revision already validated by the stock smoke test:
-
-`8906f9a12309956913eab29dade75c01cb7d0771`
-
-Changing this pin is an explicit upstream upgrade and should be revalidated first.
+- **PaperEcho Thermoelectric Weekly** — **日常推荐使用**。
+- **Thermoelectric Paper Digest Weekly** — 旧 baseline / 备用抓取周报。
+- **Paper Digest Thermoelectric Stock Smoke** — 最小 smoke test，平时不用点。
