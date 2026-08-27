@@ -1,13 +1,13 @@
 {
   "version": 2,
-  "description": "Thermoelectric screening rules for PaperEcho-TE evaluation.",
+  "description": "Thermoelectric screening rules for PaperEcho-TE.",
   "triage": {
-    "version": "2026-08-27-te-v1",
+    "version": "2026-08-27-te-v2",
     "legacy_biomedical_hard_excludes": false,
     "labels": {
-      "A": "A - directly relevant",
-      "B": "B - strongly relevant",
-      "C": "C - broad thermoelectric relevance",
+      "A": "A - read first",
+      "B": "B - strong relevance",
+      "C": "C - broad relevance",
       "D": "D - out of scope"
     },
     "source_labels": {
@@ -17,13 +17,15 @@
       "other": "other"
     },
     "research_focus": {
-      "primary_question": "Thermoelectric materials discovery, composition-property prediction, doping optimization, and transport-mechanism understanding.",
+      "primary_question": "Thermoelectric composition-property prediction, doping optimization, priority material systems, and transport-mechanism understanding.",
       "preferred_evidence": [
-        "thermoelectric",
-        "Seebeck",
+        "thermoelectric performance",
         "power factor",
         "figure of merit",
-        "zT"
+        "zT",
+        "carrier transport",
+        "thermal conductivity",
+        "Seebeck coefficient"
       ],
       "core_exposure_terms": [
         "thermoelectric",
@@ -35,19 +37,31 @@
       "core_biology_terms": [
         "GeTe",
         "Bi2Te3",
+        "Bi 2 Te 3",
         "PbTe",
         "SnSe",
         "Ag2Se",
+        "Ag 2 Se",
         "Mg3Sb2",
+        "Mg 3 Sb 2",
         "half-Heusler",
         "skutterudite",
-        "doping",
-        "dopant",
-        "composition",
-        "transport"
+        "co-doping",
+        "co doping",
+        "carrier concentration",
+        "weighted mobility",
+        "B factor",
+        "quality factor",
+        "band convergence",
+        "resonant level",
+        "machine learning",
+        "materials informatics",
+        "composition-property",
+        "property prediction"
       ],
       "mechanism_terms": [
         "band structure",
+        "band engineering",
         "band convergence",
         "carrier concentration",
         "weighted mobility",
@@ -57,69 +71,72 @@
         "bipolar transport",
         "alloying",
         "co-doping",
+        "co doping",
         "strain",
         "interface",
         "phonon",
         "carrier transport",
         "machine learning",
         "materials informatics",
-        "composition-property"
+        "composition-property",
+        "property prediction"
       ]
     },
     "priority_rules": {
       "strongly_prioritize": [
         "Direct thermoelectric ML or composition-to-property prediction.",
-        "Doping optimization or carrier-concentration optimization.",
-        "Weighted mobility, B factor, quality factor, band convergence, resonant levels, or bipolar transport.",
-        "Substantive mechanism/performance work in priority thermoelectric material systems."
+        "Co-doping or carrier-concentration optimization.",
+        "Weighted mobility, B factor, quality factor, band convergence, or resonant levels.",
+        "Mechanism/performance work in GeTe, Bi2Te3, PbTe, SnSe, Ag2Se, Mg3Sb2, half-Heusler, or skutterudite systems."
       ],
       "downgrade": [
-        "Thermoelectric is mentioned only as background without a conventional thermoelectric result.",
-        "Device work with little relevance to materials, transport, or performance optimization."
+        "General thermoelectric mechanism work outside priority systems is normally B rather than A.",
+        "Flexible/device work with little materials or transport optimization is normally C."
       ],
       "strict_exclude": [
         "Battery, supercapacitor, or ion-storage work without a direct conventional thermoelectric result.",
         "Photovoltaic or solar-cell work without a direct conventional thermoelectric result.",
-        "Generic optoelectronics without a direct conventional thermoelectric result.",
+        "Generic optoelectronics or photodetectors without a direct conventional thermoelectric materials result.",
         "Anomalous/spin Nernst or spin-caloritronic work without a direct conventional thermoelectric result."
       ]
     },
     "grading_rules": {
       "A": {
-        "definition": "Directly addresses a priority thermoelectric research question with substantive material, mechanism, optimization, or ML evidence.",
-        "required_features": ["thermoelectric relevance", "priority context", "mechanism or optimization signal"],
-        "typical_cases": ["doping optimization", "thermoelectric ML", "weighted mobility/B factor", "band convergence in a priority material"],
-        "action": "Read first and retain for detailed analysis."
+        "definition": "Read-first work: direct thermoelectric relevance plus a priority material/context plus a substantive mechanism or optimization signal.",
+        "required_features": ["thermoelectric relevance", "priority material or core optimization context", "mechanism or optimization signal"],
+        "typical_cases": ["GeTe/SnSe/Ag2Se/Mg3Sb2 mechanism optimization", "co-doping", "thermoelectric ML", "weighted mobility/B factor", "band convergence"],
+        "action": "Read first."
       },
       "B": {
-        "definition": "Strong thermoelectric mechanism or performance work that is useful but less directly tied to the highest-priority questions.",
-        "typical_cases": ["alloying", "interface engineering", "carrier/phonon transport", "nanostructuring"],
+        "definition": "Strong thermoelectric materials/mechanism/performance work with explicit performance or transport evidence, but not a read-first priority context.",
+        "typical_cases": ["general alloying", "interface engineering", "carrier/phonon transport", "high-zT material outside priority systems"],
         "action": "Retain for focused reading."
       },
       "C": {
-        "definition": "Broad thermoelectric-domain relevance with weaker direct value for the current research questions.",
-        "typical_cases": ["general device work", "background thermoelectric study", "adjacent material system"],
+        "definition": "Thermoelectric-domain work with weaker direct value for current materials/ML/optimization questions.",
+        "typical_cases": ["flexible sensor/device", "general generator", "adjacent material study"],
         "action": "Keep at low priority."
       },
       "D": {
-        "definition": "Outside the configured thermoelectric research scope or a false-positive topic.",
-        "typical_cases": ["battery", "photovoltaic", "generic optoelectronics", "spin caloritronics without conventional TE"],
+        "definition": "Outside the configured conventional thermoelectric research scope or a false-positive topic.",
+        "typical_cases": ["battery", "photovoltaic", "photodetector", "generic optoelectronics", "spin caloritronics without conventional TE"],
         "action": "Do not place in reading queue."
       }
     },
     "decision_process": [
       "Apply configured negative keywords first.",
-      "Then evaluate direct thermoelectric relevance.",
-      "Then evaluate priority material/context terms.",
-      "Then evaluate mechanism or optimization depth.",
-      "Assign A/B/C/D conservatively when evidence is incomplete."
+      "Require thermoelectric relevance before priority promotion.",
+      "Reserve A for priority material/context plus mechanism/optimization depth.",
+      "Use B for strong explicit performance/transport evidence outside A.",
+      "Use C for broad thermoelectric relevance without enough A/B evidence.",
+      "Assign D to configured false-positive topics."
     ],
     "keyword_policy": {
       "principle": "Keywords are evidence, not a substitute for scientific relevance.",
       "positive_keyword_groups": {
         "thermoelectric": ["thermoelectric", "Seebeck", "power factor", "figure of merit", "zT"],
-        "materials": ["GeTe", "Bi2Te3", "PbTe", "SnSe", "Ag2Se", "Mg3Sb2", "half-Heusler", "skutterudite"],
-        "optimization": ["doping", "dopant", "carrier concentration", "band convergence", "weighted mobility", "B factor", "quality factor", "resonant level"],
+        "priority_materials": ["GeTe", "Bi2Te3", "PbTe", "SnSe", "Ag2Se", "Mg3Sb2", "half-Heusler", "skutterudite"],
+        "priority_optimization": ["co-doping", "carrier concentration", "band convergence", "weighted mobility", "B factor", "quality factor", "resonant level"],
         "ml": ["machine learning", "materials informatics", "composition-property", "property prediction"]
       },
       "negative_keywords": [
@@ -133,34 +150,20 @@
         "photovoltaic",
         "solar cell",
         "photodetector",
+        "position-sensitive detector",
+        "position sensitive detector",
         "spin caloritronic",
         "spin Nernst",
         "anomalous Nernst"
       ],
-      "negative_keyword_handling": "Configured negative keywords are hard exclusions unless a future exception rule is explicitly added."
+      "negative_keyword_handling": "Configured negative keywords are hard exclusions."
     },
     "uncertain_boundaries": [
       "Nernst-related work that also reports conventional Seebeck/zT.",
       "Energy-conversion devices combining thermoelectric and photovoltaic functions."
     ],
     "reason_format": {
-      "required_fields": ["grade", "matched_scope", "missing_or_weak_scope", "evidence_type", "grade_reason", "uncertainty"],
-      "field_definitions": {
-        "grade": "A/B/C/D grade.",
-        "matched_scope": "Matched thermoelectric scope.",
-        "missing_or_weak_scope": "Missing or weak configured scope.",
-        "evidence_type": "Material, transport, optimization, device, or ML evidence.",
-        "grade_reason": "Reason for grade.",
-        "uncertainty": "low/medium/high"
-      },
-      "example": {
-        "grade": "A",
-        "matched_scope": "GeTe + band engineering + thermoelectric",
-        "missing_or_weak_scope": "none",
-        "evidence_type": "materials/transport",
-        "grade_reason": "Directly relevant to priority thermoelectric optimization.",
-        "uncertainty": "low"
-      }
+      "required_fields": ["grade", "matched_scope", "missing_or_weak_scope", "evidence_type", "grade_reason", "uncertainty"]
     },
     "journal_quality_filter": {
       "enabled": false,
@@ -199,13 +202,13 @@
   },
   "feedback_learning": {
     "enabled": false,
-    "principle": "Disabled during deterministic Phase-1 evaluation.",
+    "principle": "Disabled until a stable thermoelectric baseline is established.",
     "article_feedback_values": ["keep", "drop", "upgrade", "downgrade"],
     "comment_optional": true,
     "how_to_use_feedback": {},
     "learning_policy": {
       "auto_update_allowed": [],
-      "auto_update_forbidden": ["Do not change screening rules during Phase-1 evaluation."],
+      "auto_update_forbidden": ["Do not silently change screening rules."],
       "manual_review_trigger": []
     }
   }
