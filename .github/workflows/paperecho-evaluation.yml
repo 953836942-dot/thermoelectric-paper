@@ -143,19 +143,41 @@ jobs:
           node control/scripts/paperecho/compare-results.mjs paper-digest/output/latest.json evaluation/paperecho-output/state/papers.json evaluation
           cat evaluation/comparison.md
 
+      - name: Build user-facing weekly report
+        run: |
+          node control/scripts/paperecho/build-report.mjs evaluation/paperecho-output/state/papers.json evaluation/comparison.json delivery
+          cp evaluation/comparison.md delivery/comparison.md
+          cp evaluation/paperecho-output/state/papers.json delivery/papers.json
+          XLSX="$(find evaluation/paperecho-output/exports -type f -name '*.xlsx' -print -quit)"
+          test -n "$XLSX"
+          cp "$XLSX" "delivery/周报.xlsx"
+          cp paper-digest/output/latest.md delivery/source-digest.md
+
       - name: Verify required evaluation outputs
         run: |
           test -s evaluation/comparison.md
           test -s evaluation/comparison.json
           test -s evaluation/paperecho-output/state/papers.json
-          find evaluation/paperecho-output/exports -type f -name '*.xlsx' -print -quit | grep -q .
+          test -s delivery/index.html
+          test -s delivery/report.json
+          test -s delivery/comparison.md
+          test -s "delivery/周报.xlsx"
+          grep -q "Top papers this week" delivery/index.html
 
-      - name: Upload complete evaluation artifact
+      - name: Upload simple weekly report
+        uses: actions/upload-artifact@v7
+        with:
+          name: paperecho-te-report-${{ github.run_number }}
+          retention-days: 90
+          if-no-files-found: error
+          path: delivery/
+
+      - name: Upload complete evaluation debug artifact
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: paperecho-evaluation-${{ github.run_number }}
-          retention-days: 90
+          name: paperecho-evaluation-debug-${{ github.run_number }}
+          retention-days: 30
           if-no-files-found: warn
           path: |
             paper-digest/output/
