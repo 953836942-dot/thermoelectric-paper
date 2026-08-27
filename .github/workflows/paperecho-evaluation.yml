@@ -25,7 +25,7 @@ jobs:
       - name: Run repository-side PaperEcho tests
         run: node --test tests/paperecho/*.test.mjs
 
-  classifier-integration-red:
+  classifier-integration:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout thermoelectric control repository
@@ -44,9 +44,11 @@ jobs:
       - name: Install stock PaperEcho dependencies
         working-directory: PaperEcho
         run: npm ci
-      - name: Install thermoelectric rule configuration only
+      - name: Install thermoelectric rule configuration
         run: cp control/paperecho-config/review-workflow-rules.json PaperEcho/config/review-workflow-rules.json
-      - name: Run classifier behavior test against unpatched stock classifier
+      - name: Apply minimal thermoelectric classifier patch
+        run: node control/paperecho-patch/apply-te-classifier-patch.mjs PaperEcho/workflow/tools/stage1/rule_classifier.mjs
+      - name: Run classifier behavior tests
         env:
           PAPERECHO_ROOT: ${{ github.workspace }}/PaperEcho
         working-directory: control
