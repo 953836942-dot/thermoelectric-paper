@@ -47,7 +47,12 @@ jobs:
       - name: Materialize production config
         run: cp control/configs/thermoelectric-weekly.toml paper-digest/config.toml
 
+      # Scheduled and manual production runs keep state/history. Push-triggered
+      # config validation is intentionally stateless so keyword changes can be
+      # evaluated against the full current lookback window without polluting
+      # production deduplication state.
       - name: Restore digest state
+        if: ${{ github.event_name != 'push' }}
         id: state-restore
         uses: actions/cache/restore@v5
         with:
@@ -57,6 +62,7 @@ jobs:
             thermoelectric-paper-digest-state-
 
       - name: Restore archive history
+        if: ${{ github.event_name != 'push' }}
         id: output-restore
         uses: actions/cache/restore@v5
         with:
@@ -101,14 +107,14 @@ jobs:
           retention-days: 90
 
       - name: Save digest state
-        if: ${{ always() && hashFiles('paper-digest/.paper-digest-state/**') != '' }}
+        if: ${{ github.event_name != 'push' && always() && hashFiles('paper-digest/.paper-digest-state/**') != '' }}
         uses: actions/cache/save@v5
         with:
           path: paper-digest/.paper-digest-state
           key: thermoelectric-paper-digest-state-${{ github.run_id }}
 
       - name: Save archive history
-        if: ${{ success() && hashFiles('paper-digest/output/**') != '' }}
+        if: ${{ github.event_name != 'push' && success() && hashFiles('paper-digest/output/**') != '' }}
         uses: actions/cache/save@v5
         with:
           path: paper-digest/output
