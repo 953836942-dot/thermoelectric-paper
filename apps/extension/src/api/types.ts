@@ -53,6 +53,12 @@ export interface PaperView {
   feedbackState: Exclude<FeedbackAction, "clear"> | null;
 }
 
+export interface WeeklySummary {
+  brief: string;
+  keyThemes: string[];
+  paperSummaries: Record<string, string>;
+}
+
 export interface LatestReport {
   runId: string;
   lastSuccessfulUpdate: string;
@@ -60,6 +66,7 @@ export interface LatestReport {
   gradeCounts: Record<Grade, number>;
   sourceStatus: Record<string, string>;
   topPapers: PaperView[];
+  summary?: WeeklySummary;
 }
 
 export interface RunSummary {
