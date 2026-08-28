@@ -12,6 +12,7 @@ import type {
   RunSummary
 } from "../api/types";
 import { searchRecentOpenAlex } from "./openalex";
+import { generateWeeklySummary } from "./summary";
 import { loadLiteState, saveLiteState, type LiteState } from "./store";
 
 function mergeConfig(current: ResearchConfig, patch: Partial<ResearchConfig> | undefined): ResearchConfig {
@@ -92,7 +93,8 @@ export function createLocalLiteratureClient(options: { fetchImpl?: typeof fetch 
           openalex: result.failedQueries ? `${result.successfulQueries} queries ok, ${result.failedQueries} failed` : `${result.successfulQueries} queries ok`,
           mode: "local-first"
         },
-        topPapers: papers.filter(item => item.grade === "A" && item.feedbackState !== "not_relevant").slice(0, 5)
+        topPapers: papers.filter(item => item.grade === "A" && item.feedbackState !== "not_relevant").slice(0, 5),
+        summary: generateWeeklySummary(papers)
       };
       state.papers = papers;
       state.report = report;
@@ -110,7 +112,12 @@ export function createLocalLiteratureClient(options: { fetchImpl?: typeof fetch 
     },
 
     async getLatestReport() {
-      return (await loadLiteState()).report;
+      const state = await loadLiteState();
+      if (!state.report.summary) {
+        state.report.summary = generateWeeklySummary(state.papers);
+        await saveLiteState(state);
+      }
+      return state.report;
     },
 
     async getPapers(query: PapersQuery = {}) {
@@ -124,6 +131,7 @@ export function createLocalLiteratureClient(options: { fetchImpl?: typeof fetch 
       if (!paper) throw new Error("Paper not found in this browser.");
       paper.feedbackState = action === "clear" ? null : action;
       state.report.topPapers = state.papers.filter(item => item.grade === "A" && item.feedbackState !== "not_relevant").slice(0, 5);
+      state.report.summary = generateWeeklySummary(state.papers);
       await saveLiteState(state);
       return feedbackResult(paper);
     },
