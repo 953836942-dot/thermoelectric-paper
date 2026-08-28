@@ -2,6 +2,7 @@ import { render } from "preact";
 import { createLocalLiteratureClient } from "../local/client";
 import { Dashboard } from "./Dashboard";
 import "../styles/tokens.css";
+import "../styles/summary.css";
 
 function mountNode(): HTMLElement {
   const node = document.getElementById("app");
