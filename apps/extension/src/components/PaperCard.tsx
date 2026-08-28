@@ -3,6 +3,7 @@ import type { FeedbackAction, FeedbackResponse, PaperView } from "../api/types";
 
 export interface PaperCardProps {
   paper: PaperView;
+  summary?: string;
   sendFeedback: (paperId: string, action: FeedbackAction) => Promise<FeedbackResponse>;
   onHidden?: (paperId: string) => void;
 }
@@ -14,7 +15,7 @@ const ACTIONS: Array<{ action: Exclude<FeedbackAction, "clear">; label: string; 
   { action: "done", label: "Done", symbol: "✓" }
 ];
 
-export function PaperCard({ paper, sendFeedback, onHidden }: PaperCardProps) {
+export function PaperCard({ paper, summary, sendFeedback, onHidden }: PaperCardProps) {
   const [feedback, setFeedback] = useState<PaperView["feedbackState"]>(paper.feedbackState);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,6 +59,13 @@ export function PaperCard({ paper, sendFeedback, onHidden }: PaperCardProps) {
           </div>
           <span class="score-pill">Score {Math.round(paper.score)}</span>
         </div>
+
+        {summary ? (
+          <div class="paper-summary">
+            <span class="paper-summary-label">Quick summary</span>
+            <p>{summary}</p>
+          </div>
+        ) : null}
 
         <div class="reason-list" aria-label="Why this paper was ranked here">
           {paper.reasons.slice(0, 3).map(reason => <span key={reason}>{reason}</span>)}
