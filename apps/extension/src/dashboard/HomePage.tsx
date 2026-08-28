@@ -54,6 +54,7 @@ export function HomePage({ api }: HomePageProps) {
   }
 
   const sendFeedback = (paperId: string, action: FeedbackAction): Promise<FeedbackResponse> => api.sendFeedback(paperId, action);
+  const paperSummaries = report?.summary?.paperSummaries ?? {};
 
   if (loading) return <main class="dashboard-content"><p class="dashboard-status" role="status">Loading your literature report…</p></main>;
   if (error) return <main class="dashboard-content"><p class="dashboard-status error" role="alert">{error}</p></main>;
@@ -76,8 +77,26 @@ export function HomePage({ api }: HomePageProps) {
         ) : null}
       </section>
 
-      <GradeSection grade="A" papers={papers.A} sendFeedback={sendFeedback} onHidden={hidePaper} />
-      <GradeSection grade="B" papers={papers.B} sendFeedback={sendFeedback} onHidden={hidePaper} />
+      {report?.summary ? (
+        <section class="weekly-summary-card" aria-labelledby="weekly-summary-heading">
+          <div class="weekly-summary-heading-row">
+            <div>
+              <p class="grade-kicker">WEEKLY DIGEST</p>
+              <h2 id="weekly-summary-heading">This week in brief</h2>
+            </div>
+            <span class="summary-mode">Local summary</span>
+          </div>
+          <p class="weekly-summary-text">{report.summary.brief}</p>
+          {report.summary.keyThemes.length ? (
+            <div class="theme-list" aria-label="Key themes">
+              {report.summary.keyThemes.map(theme => <span key={theme}>{theme}</span>)}
+            </div>
+          ) : null}
+        </section>
+      ) : null}
+
+      <GradeSection grade="A" papers={papers.A} paperSummaries={paperSummaries} sendFeedback={sendFeedback} onHidden={hidePaper} />
+      <GradeSection grade="B" papers={papers.B} paperSummaries={paperSummaries} sendFeedback={sendFeedback} onHidden={hidePaper} />
       <GradeSection grade="C" papers={papers.C} sendFeedback={sendFeedback} onHidden={hidePaper} />
       <GradeSection
         grade="D"
