@@ -11,13 +11,14 @@ const LABELS: Record<Grade, string> = {
 interface GradeSectionProps {
   grade: Grade;
   papers: PaperView[];
+  paperSummaries?: Record<string, string>;
   sendFeedback: (paperId: string, action: FeedbackAction) => Promise<FeedbackResponse>;
   onHidden?: (paperId: string) => void;
   collapsed?: boolean;
   onToggle?: () => void;
 }
 
-export function GradeSection({ grade, papers, sendFeedback, onHidden, collapsed = false, onToggle }: GradeSectionProps) {
+export function GradeSection({ grade, papers, paperSummaries = {}, sendFeedback, onHidden, collapsed = false, onToggle }: GradeSectionProps) {
   if (collapsed) {
     return (
       <section class="grade-section collapsed-grade">
@@ -40,7 +41,7 @@ export function GradeSection({ grade, papers, sendFeedback, onHidden, collapsed 
       </div>
       <div class="dashboard-paper-list">
         {papers.map(paper => (
-          <PaperCard key={paper.paperId} paper={paper} sendFeedback={sendFeedback} onHidden={onHidden} />
+          <PaperCard key={paper.paperId} paper={paper} summary={paperSummaries[paper.paperId]} sendFeedback={sendFeedback} onHidden={onHidden} />
         ))}
         {papers.length === 0 ? <p class="empty-state">No active papers in this grade.</p> : null}
       </div>
