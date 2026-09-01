@@ -4,7 +4,11 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from .helpers import import_te_radar
+try:
+    from .helpers import import_te_radar
+except ImportError:
+    from helpers import import_te_radar
+
 import_te_radar()
 from te_radar.records import PaperRecord
 from te_radar.dedupe import dedupe_records, paper_identity
@@ -13,12 +17,7 @@ from te_radar.state import load_state, update_success_state
 
 class DedupeStateTests(unittest.TestCase):
     def paper(self, **kw):
-        base = dict(
-            id="", title="Thermoelectric transport in PbTe", authors=["A. Author"],
-            source="Example", source_kind="journal", peer_review_status="peer_reviewed",
-            source_tier="high", date="2026-08-30", doi="", url="", abstract="",
-            keywords=[], concepts=[], raw_source="test", notes=[]
-        )
+        base = dict(id="", title="Thermoelectric transport in PbTe", authors=["A. Author"], source="Example", source_kind="journal", peer_review_status="peer_reviewed", source_tier="high", date="2026-08-30", doi="", url="", abstract="", keywords=[], concepts=[], raw_source="test", notes=[])
         base.update(kw)
         return PaperRecord(**base)
 
