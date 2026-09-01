@@ -104,3 +104,9 @@ PaperEcho 原版里对材料学不合适的 biomedical hard-exclude 已通过一
 - **PaperEcho Thermoelectric Weekly** — **日常推荐使用**。
 - **Thermoelectric Paper Digest Weekly** — 旧 baseline / 备用抓取周报。
 - **Paper Digest Thermoelectric Stock Smoke** — 最小 smoke test，平时不用点。
+
+## Experimental: TE Literature Radar
+
+`feature/te-literature-radar` 还包含一套新的轻量 **TE Literature Radar Codex Skill**。它独立于当前 PaperEcho production workflow，使用 Crossref + OpenAlex + arXiv + RSS，支持 `auto`、最近 N 天以及任意起止日期搜索，并由 Codex 在受限证据上判断创新性，再由确定性代码完成 A/B/C 分级。
+
+详细配置、手动补搜和 Codex Automation 用法见 `docs/te-literature-radar.md`。在新雷达完成真实运行对比前，当前 PaperEcho 周报仍保持原样，不做自动迁移。
