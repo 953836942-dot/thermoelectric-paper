@@ -1,17 +1,12 @@
 name: Temporary ESTM export
-
 on:
   push:
-    branches:
-      - tmp-estm-export-20260901
-    paths:
-      - '.github/workflows/tmp_estm_export.yml'
-
+    branches: [tmp-estm-export-20260901]
+    paths: ['.github/workflows/tmp_estm_export.yml']
 permissions:
   contents: write
-
 jobs:
-  export-estm:
+  inspect-starry:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,31 +15,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install reader
-        run: pip install --quiet pandas openpyxl
-      - name: Download and convert ESTM
+      - run: pip install --quiet pandas
+      - name: Inspect current Starry TE files
         run: |
-          mkdir -p tmp_estm_export/chunks
           python - <<'PY'
-          import pandas as pd, urllib.request, gzip, base64, pathlib
-          url='https://raw.githubusercontent.com/KRICT-DATA/SIMD/main/dataset/estm.xlsx'
-          urllib.request.urlretrieve(url,'tmp_estm_export/estm.xlsx')
-          df=pd.read_excel('tmp_estm_export/estm.xlsx')
-          csv=df.to_csv(index=False).encode()
-          enc=base64.b64encode(gzip.compress(csv,compresslevel=9)).decode()
-          chunk=24000
-          d=pathlib.Path('tmp_estm_export/chunks')
-          for p in d.glob('*.txt'): p.unlink()
-          for i in range(0,len(enc),chunk):
-              (d/f'chunk_{i//chunk:03d}.txt').write_text(enc[i:i+chunk])
-          pathlib.Path('tmp_estm_export/manifest.txt').write_text(f'rows={len(df)}\ncols={len(df.columns)}\nbase64_chars={len(enc)}\nchunks={(len(enc)+chunk-1)//chunk}\n')
-          print(df.shape, len(enc), (len(enc)+chunk-1)//chunk)
+          import pandas as pd
+          base='https://github.com/starrydata/starrydata_datasets/releases/latest/download'
+          for kind in ['curves','samples','papers']:
+              u=f'{base}/ThermoelectricMaterials_{kind}.csv.gz'
+              d=pd.read_csv(u,compression='gzip',nrows=20)
+              with open(f'tmp_estm_export/starry_{kind}_head.txt','w') as f:
+                  f.write('COLUMNS\n'+repr(d.columns.tolist())+'\n\nHEAD\n'+d.to_string(index=False))
+              print(kind,d.columns.tolist())
           PY
-          rm -f tmp_estm_export/estm.xlsx
-      - name: Commit export
+      - name: Commit inspection
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add tmp_estm_export/chunks tmp_estm_export/manifest.txt
-          git commit -m 'Add temporary ESTM transfer chunks' || exit 0
+          git add tmp_estm_export/starry_*_head.txt
+          git commit -m 'Inspect current Starry TE schema' || exit 0
           git push origin HEAD:tmp-estm-export-20260901
