@@ -1,0 +1,11 @@
+metric,value
+starry_zT_rows,281082
+starry_unique_formula_keys,12696
+estm_rows,5205
+estm_unique_formula_keys,870
+feature_elements,77
+starry_rows_exact_ESTM_formula,29558
+starry_rows_ESTM_source_DOI,4777
+starry_rows_either_formula_or_DOI,30499
+ESTM_formulas_seen_in_Starry,354
+ESTM_DOIs_seen_in_Starry,67

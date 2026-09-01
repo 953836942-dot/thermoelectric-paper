@@ -1,0 +1,17 @@
+                   protocol  train_rows  train_formulas  train_dois  test_rows  test_formulas       r2  spearman      mae     rmse
+              E0_all_starry      281082           12696        4061       5205            870 0.663901  0.802585 0.137298 0.201444
+             E1_formula_OOD      251524           12342        3807       5205            870 0.583131  0.756822 0.154192 0.224347
+             E2_article_OOD      276305           12469        3994       5205            870 0.602468  0.769052 0.149402 0.219082
+E3_formula_plus_article_OOD      250583           12285        3782       5205            870 0.577087  0.755243 0.154936 0.225968
+
+                           metric  value
+                   starry_zT_rows 281082
+       starry_unique_formula_keys  12696
+                        estm_rows   5205
+         estm_unique_formula_keys    870
+                 feature_elements     77
+   starry_rows_exact_ESTM_formula  29558
+      starry_rows_ESTM_source_DOI   4777
+starry_rows_either_formula_or_DOI  30499
+     ESTM_formulas_seen_in_Starry    354
+         ESTM_DOIs_seen_in_Starry     67
