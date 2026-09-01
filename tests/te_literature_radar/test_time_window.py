@@ -1,7 +1,10 @@
 import datetime as dt
 import unittest
 
-from .helpers import import_te_radar
+try:
+    from .helpers import import_te_radar
+except ImportError:
+    from helpers import import_te_radar
 
 import_te_radar()
 from te_radar.time_window import resolve_search_window
@@ -30,9 +33,7 @@ class SearchWindowTests(unittest.TestCase):
         self.assertFalse(window.advance_auto_state)
 
     def test_range_uses_explicit_dates(self):
-        window = resolve_search_window(
-            {}, {}, mode="range", start_date="2026-01-01", end_date="2026-06-30", now=NOW
-        )
+        window = resolve_search_window({}, {}, mode="range", start_date="2026-01-01", end_date="2026-06-30", now=NOW)
         self.assertEqual(window.start.date().isoformat(), "2026-01-01")
         self.assertEqual(window.end.date().isoformat(), "2026-06-30")
         self.assertFalse(window.advance_auto_state)
