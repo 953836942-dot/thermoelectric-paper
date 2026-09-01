@@ -69,12 +69,13 @@ def main():
         return
 
     fetch_payload = read_json(args.fetch)
-    analysis_payload = read_json(args.analysis)
     if args.command == "validate-analysis":
+        analysis_payload = read_json(args.analysis)
         validate_analysis(fetch_payload, analysis_payload)
         print("valid")
         return
     if args.command == "merge-analysis":
+        analysis_payload = read_json(args.analysis)
         write_json(Path(args.output), merge_analysis(fetch_payload, analysis_payload))
         print(args.output)
         return
