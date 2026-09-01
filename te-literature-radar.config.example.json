@@ -2,20 +2,8 @@
   "timezone": "Australia/Brisbane",
   "output_dir": "te-literature-radar-output",
   "language": "zh-CN",
-  "search": {
-    "mode": "auto",
-    "first_run_lookback_days": 7,
-    "overlap_hours": 48,
-    "per_query_rows": 50,
-    "analysis_candidate_limit": 30
-  },
-  "score_weights": {
-    "te_relevance": 30,
-    "research_quality": 30,
-    "novelty": 20,
-    "research_fit": 10,
-    "recency": 10
-  },
+  "search": {"mode": "auto", "first_run_lookback_days": 7, "overlap_hours": 48, "per_query_rows": 50, "analysis_candidate_limit": 30},
+  "score_weights": {"te_relevance": 30, "research_quality": 30, "novelty": 20, "research_fit": 10, "recency": 10},
   "research_profile": {
     "core": ["thermoelectric", "Seebeck effect", "thermoelectric material", "thermoelectric properties"],
     "transport": ["figure of merit", "zT", "power factor", "Seebeck coefficient", "electrical conductivity", "thermal conductivity", "lattice thermal conductivity", "carrier transport", "phonon transport"],
@@ -25,10 +13,19 @@
     "watched_materials": []
   },
   "quality_tier_points": {"premier": 28, "elite": 26, "high": 24, "solid": 16, "standard": 12, "preprint": 8},
-  "target_journals": [],
+  "target_journals": [
+    {"name": "Nature", "tier": "premier", "issn": ["0028-0836", "1476-4687"]},
+    {"name": "Nature Materials", "tier": "premier", "issn": ["1476-1122", "1476-4660"]},
+    {"name": "Nature Energy", "tier": "premier", "issn": ["2058-7546"]},
+    {"name": "Nature Communications", "tier": "elite", "issn": ["2041-1723"]},
+    {"name": "Energy & Environmental Science", "tier": "elite", "issn": ["1754-5706"]},
+    {"name": "Advanced Materials", "tier": "elite", "issn": ["0935-9648", "1521-4095"]},
+    {"name": "Advanced Energy Materials", "tier": "high", "issn": ["1614-6832", "1614-6840"]},
+    {"name": "Advanced Functional Materials", "tier": "high", "issn": ["1616-301X", "1616-3028"]}
+  ],
   "target_authors": [],
-  "openalex": {"enabled": true, "mailto": "", "queries": []},
-  "arxiv": {"enabled": true, "queries": []},
+  "openalex": {"enabled": true, "mailto": "", "queries": ["thermoelectric materials", "Seebeck thermoelectric", "thermoelectric zT power factor", "thermoelectric doping band engineering", "thermoelectric machine learning materials discovery"]},
+  "arxiv": {"enabled": true, "queries": ["thermoelectric", "Seebeck thermoelectric", "thermoelectric machine learning", "thermoelectric materials discovery"]},
   "rss_feeds": [],
   "email": {"enabled": false, "smtp_host": "smtp.gmail.com", "smtp_port": 587, "smtp_username": "", "smtp_password_env": "TE_RADAR_GMAIL_APP_PASSWORD", "smtp_password_file": ".secrets/gmail_app_password", "use_starttls": true, "from": "", "to": ""}
 }

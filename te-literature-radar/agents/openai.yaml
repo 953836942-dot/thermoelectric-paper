@@ -1,0 +1,3 @@
+display_name: TE Literature Radar
+short_description: Discover, rank, and summarize high-quality thermoelectric literature.
+default_prompt: Run my thermoelectric literature radar, assess novelty from the supplied evidence, and produce the A/B/C digest.
