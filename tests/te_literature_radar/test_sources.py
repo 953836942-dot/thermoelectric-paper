@@ -31,11 +31,16 @@ class SourceTests(unittest.TestCase):
         self.assertIn("zT reaches 1.8",result.papers[0].abstract)
 
     @patch("te_radar.sources.openalex.http_get", return_value=json.dumps(OPENALEX_FIXTURE).encode())
-    def test_openalex_reconstructs_abstract(self, _):
-        cfg={"search":{"per_query_rows":10},"openalex":{"enabled":True,"queries":["thermoelectric"]}}
+    def test_openalex_reconstructs_abstract_and_inherits_configured_tier(self, _):
+        cfg={
+            "search":{"per_query_rows":10},
+            "openalex":{"enabled":True,"queries":["thermoelectric"]},
+            "target_journals":[{"name":"Advanced Materials","tier":"elite","issn":[]}],
+        }
         result=fetch_openalex(cfg,WINDOW)
         self.assertEqual(result.papers[0].abstract,"Thermoelectric screening materials")
         self.assertEqual(result.papers[0].peer_review_status,"peer_reviewed")
+        self.assertEqual(result.papers[0].source_tier,"elite")
 
     @patch("te_radar.sources.arxiv.http_get", return_value=ARXIV_FIXTURE.encode())
     def test_arxiv_is_preprint(self, _):
