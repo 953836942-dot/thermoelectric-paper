@@ -24,6 +24,7 @@ def fetch_openalex(config, window) -> SourceResult:
         return SourceResult([], [])
     rows = min(int(config.get("search", {}).get("per_query_rows", 50)), 200)
     papers, errors = [], []
+    configured_tiers = {str(j.get("name", "")).strip().lower(): j.get("tier", "unknown") for j in config.get("target_journals", []) if j.get("name")}
     for query in cfg.get("queries", []):
         cursor = "*"
         remaining = rows
@@ -53,7 +54,8 @@ def fetch_openalex(config, window) -> SourceResult:
                 if "preprint" in host_type or "repository" in host_type:
                     status, tier = "preprint", "preprint"
                 elif work_type in {"article", "journal-article"} or source_obj:
-                    status, tier = "peer_reviewed", "unknown"
+                    status = "peer_reviewed"
+                    tier = configured_tiers.get(source.strip().lower(), "unknown")
                 else:
                     status, tier = "unknown", "unknown"
                 papers.append(PaperRecord(
