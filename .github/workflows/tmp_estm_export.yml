@@ -1,0 +1,45 @@
+name: Temporary ESTM export
+
+on:
+  push:
+    branches:
+      - tmp-estm-export-20260901
+    paths:
+      - '.github/workflows/tmp_estm_export.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  export-estm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: tmp-estm-export-20260901
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install reader
+        run: pip install --quiet pandas openpyxl
+      - name: Download and convert ESTM
+        run: |
+          mkdir -p tmp_estm_export
+          python - <<'PY'
+          import pandas as pd
+          import urllib.request
+          url = 'https://raw.githubusercontent.com/KRICT-DATA/SIMD/main/dataset/estm.xlsx'
+          urllib.request.urlretrieve(url, 'tmp_estm_export/estm.xlsx')
+          df = pd.read_excel('tmp_estm_export/estm.xlsx')
+          df.to_csv('tmp_estm_export/estm.csv', index=False)
+          print(df.shape)
+          print(df.columns.tolist())
+          PY
+          rm tmp_estm_export/estm.xlsx
+      - name: Commit CSV export
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tmp_estm_export/estm.csv
+          git commit -m 'Temporary ESTM CSV export' || exit 0
+          git push origin HEAD:tmp-estm-export-20260901
