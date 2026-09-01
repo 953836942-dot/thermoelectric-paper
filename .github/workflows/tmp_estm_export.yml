@@ -20,13 +20,13 @@ jobs:
       - name: Run ESTM protocol benchmark
         run: |
           cat > /tmp/run_estm.py <<'PY'
-          import ast,urllib.request
+          import ast,urllib.request,os
           import numpy as np, pandas as pd
           from sklearn.metrics import r2_score,mean_absolute_error,mean_squared_error
           from scipy.stats import spearmanr
           from xgboost import XGBRegressor
           import chemparse
-          from CBFV.composition import generate_features
+          from CBFV.composition import generate_features, parse_formula
 
           BASE='https://github.com/starrydata/starrydata_datasets/releases/latest/download'
           curves=pd.read_csv(f'{BASE}/ThermoelectricMaterials_curves.csv.gz',compression='gzip')
@@ -47,6 +47,11 @@ jobs:
               if isinstance(x,(list,tuple,np.ndarray)): return list(x)
               try:return ast.literal_eval(str(x))
               except:return []
+          def cbfv_ok(s):
+              try:
+                  parse_formula(str(s)); return True
+              except Exception:
+                  return False
 
           py=curves['prop_y'].astype(str).str.lower().str.replace(' ','',regex=False)
           px=curves['prop_x'].astype(str).str.lower().str.replace(' ','',regex=False)
@@ -66,8 +71,15 @@ jobs:
           estm_f=set(estm.fkey); estm_d=set(estm.doi)-{''}
 
           forms=pd.DataFrame({'formula':pd.unique(pd.concat([tr.formula,estm.formula],ignore_index=True)),'target':0.0})
-          feat,_,_,_=generate_features(forms,elem_prop='oliynyk',drop_duplicates=False,extend_features=False,sum_feat=True)
-          feat=feat.reset_index(drop=True); feat['formula']=forms.formula.values[:len(feat)]
+          ok=forms.formula.map(cbfv_ok)
+          rejected=forms.loc[~ok,'formula'].astype(str).tolist()
+          forms=forms.loc[ok].reset_index(drop=True)
+          feat,_,formulae,skipped=generate_features(forms,elem_prop='oliynyk',drop_duplicates=False,extend_features=False,sum_feat=True)
+          feat=feat.reset_index(drop=True)
+          ff=list(pd.Series(formulae).astype(str))
+          if len(ff)!=len(feat):
+              raise RuntimeError(f'CBFV formula mapping mismatch: features={len(feat)} formulas={len(ff)} skipped={len(skipped)}')
+          feat['formula']=ff
           numeric=[c for c in feat.columns if c!='formula' and pd.api.types.is_numeric_dtype(feat[c])]
           fmap=feat.set_index('formula')[numeric]; good_forms=set(fmap.index)
           tr=tr[tr.formula.isin(good_forms)].copy(); estm=estm[estm.formula.isin(good_forms)].copy()
@@ -91,21 +103,23 @@ jobs:
               model.fit(X(d),d.zT.to_numpy(float)); p=model.predict(Xtest); predout[name]=p
               out.append({'protocol':name,'train_rows':len(d),'train_formulas':d.fkey.nunique(),'train_dois':d.doi.replace('',np.nan).nunique(),'test_rows':len(estm),'test_formulas':estm.fkey.nunique(),'r2':r2_score(ytest,p),'spearman':spearmanr(ytest,p).statistic,'mae':mean_absolute_error(ytest,p),'rmse':mean_squared_error(ytest,p)**0.5})
           overlap=pd.DataFrame([
-              {'metric':'starry_zT_rows_pre_filter','value':len(tr)},
+              {'metric':'starry_zT_rows_after_CBFV_filter','value':len(tr)},
               {'metric':'starry_unique_formula_keys','value':tr.fkey.nunique()},
-              {'metric':'estm_rows','value':len(estm)},
+              {'metric':'estm_rows_after_CBFV_filter','value':len(estm)},
               {'metric':'estm_unique_formula_keys','value':estm.fkey.nunique()},
+              {'metric':'CBFV_rejected_unique_formula_strings','value':len(rejected)},
+              {'metric':'CBFV_skipped_after_prefilter','value':len(skipped)},
               {'metric':'starry_rows_exact_ESTM_formula','value':int(tr.fkey.isin(estm_f).sum())},
               {'metric':'starry_rows_ESTM_source_DOI','value':int(tr.doi.isin(estm_d).sum())},
               {'metric':'starry_rows_either_formula_or_DOI','value':int((tr.fkey.isin(estm_f)|tr.doi.isin(estm_d)).sum())},
               {'metric':'ESTM_formulas_seen_in_Starry','value':int(estm.loc[estm.fkey.isin(set(tr.fkey)),'fkey'].nunique())},
               {'metric':'ESTM_DOIs_seen_in_Starry','value':int(estm.loc[estm.doi.isin(set(tr.doi)),'doi'].nunique())},
           ])
-          import os
           os.makedirs('tmp_estm_export/benchmark',exist_ok=True)
           pd.DataFrame(out).to_csv('tmp_estm_export/benchmark/metrics.csv',index=False)
           overlap.to_csv('tmp_estm_export/benchmark/overlap.csv',index=False)
           predout.to_csv('tmp_estm_export/benchmark/predictions.csv',index=False)
+          pd.Series(rejected,name='formula').to_csv('tmp_estm_export/benchmark/cbfv_rejected_formulas.csv',index=False)
           with open('tmp_estm_export/benchmark/summary.txt','w') as f:f.write(pd.DataFrame(out).to_string(index=False)+'\n\n'+overlap.to_string(index=False)+'\n')
           print(pd.DataFrame(out).to_string(index=False)); print(overlap.to_string(index=False))
           PY
