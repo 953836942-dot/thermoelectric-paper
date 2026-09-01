@@ -20,7 +20,7 @@ jobs:
       - name: Run ESTM protocol benchmark
         run: |
           cat > /tmp/run_estm.py <<'PY'
-          import ast,re,urllib.request
+          import ast,urllib.request
           import numpy as np, pandas as pd
           from sklearn.metrics import r2_score,mean_absolute_error,mean_squared_error
           from scipy.stats import spearmanr
@@ -39,69 +39,56 @@ jobs:
           def fkey(s):
               s=str(s).replace(' ','')
               try:
-                  d=chemparse.parse_formula(s)
-                  d={k:float(v) for k,v in d.items() if float(v)>0}
-                  z=sum(d.values())
+                  d=chemparse.parse_formula(s); d={k:float(v) for k,v in d.items() if float(v)>0}; z=sum(d.values())
                   if not d or z<=0:return 'RAW:'+s
                   return '|'.join(f'{k}:{d[k]/z:.8f}' for k in sorted(d))
-              except Exception:
-                  return 'RAW:'+s
+              except Exception:return 'RAW:'+s
           def arr(x):
               if isinstance(x,(list,tuple,np.ndarray)): return list(x)
               try:return ast.literal_eval(str(x))
               except:return []
 
-          # Expand only measured zT-vs-temperature curves.
           py=curves['prop_y'].astype(str).str.lower().str.replace(' ','',regex=False)
           px=curves['prop_x'].astype(str).str.lower().str.replace(' ','',regex=False)
           zc=curves[px.str.contains('temperature') & py.isin(['zt','z_t','figureofmerit'])].copy()
           rows=[]
           for r in zc.itertuples(index=False):
-              xs,ys=arr(r.x),arr(r.y)
-              for t,z in zip(xs,ys):
+              for t,z in zip(arr(r.x),arr(r.y)):
                   try:t=float(t);z=float(z)
                   except:continue
                   if np.isfinite(t) and np.isfinite(z) and 0<=z<=3 and 20<=t<=2000:
                       rows.append((str(r.composition),t,z,normdoi(r.DOI),str(r.SID)))
           tr=pd.DataFrame(rows,columns=['formula','T','zT','doi','sid']).drop_duplicates()
           estm=estm.rename(columns={'Formula':'formula','temperature(K)':'T','ZT':'zT','reference':'doi'}).copy()
-          estm['T']=pd.to_numeric(estm['T'],errors='coerce');estm['zT']=pd.to_numeric(estm['zT'],errors='coerce')
-          estm=estm[np.isfinite(estm.T)&np.isfinite(estm.zT)&estm.zT.between(0,3)].copy()
-          tr['fkey']=tr.formula.map(fkey);estm['fkey']=estm.formula.map(fkey)
-          estm['doi']=estm.doi.map(normdoi)
+          estm['T']=pd.to_numeric(estm['T'],errors='coerce'); estm['zT']=pd.to_numeric(estm['zT'],errors='coerce')
+          estm=estm[np.isfinite(estm['T'])&np.isfinite(estm['zT'])&estm['zT'].between(0,3)].copy()
+          tr['fkey']=tr.formula.map(fkey); estm['fkey']=estm.formula.map(fkey); estm['doi']=estm.doi.map(normdoi)
           estm_f=set(estm.fkey); estm_d=set(estm.doi)-{''}
 
-          # CBFV on union of unique formulas. CBFV expects formula,target columns.
           forms=pd.DataFrame({'formula':pd.unique(pd.concat([tr.formula,estm.formula],ignore_index=True)),'target':0.0})
           feat,_,_,_=generate_features(forms,elem_prop='oliynyk',drop_duplicates=False,extend_features=False,sum_feat=True)
-          # CBFV returns a dataframe; retain numeric feature columns only, formula may be index/column depending version.
-          feat=feat.reset_index(drop=True)
-          feat['formula']=forms.formula.values[:len(feat)]
+          feat=feat.reset_index(drop=True); feat['formula']=forms.formula.values[:len(feat)]
           numeric=[c for c in feat.columns if c!='formula' and pd.api.types.is_numeric_dtype(feat[c])]
-          fmap=feat.set_index('formula')[numeric]
-          good_forms=set(fmap.index)
-          tr=tr[tr.formula.isin(good_forms)].copy();estm=estm[estm.formula.isin(good_forms)].copy()
+          fmap=feat.set_index('formula')[numeric]; good_forms=set(fmap.index)
+          tr=tr[tr.formula.isin(good_forms)].copy(); estm=estm[estm.formula.isin(good_forms)].copy()
 
           def X(df):
               a=fmap.loc[df.formula].to_numpy(np.float32)
-              tt=df.T.to_numpy(np.float32).reshape(-1,1)
-              # same simple temperature expansion across protocols
-              temp=np.column_stack([tt[:,0]/1000,(tt[:,0]/1000)**2,np.sin(np.pi*tt[:,0]/1000),np.cos(np.pi*tt[:,0]/1000)]).astype(np.float32)
+              tt=df['T'].to_numpy(np.float32)
+              temp=np.column_stack([tt/1000,(tt/1000)**2,np.sin(np.pi*tt/1000),np.cos(np.pi*tt/1000)]).astype(np.float32)
               return np.column_stack([a,temp])
-          Xtest=X(estm);ytest=estm.zT.to_numpy(float)
+          Xtest=X(estm); ytest=estm.zT.to_numpy(float)
           protocols={
              'E0_all_starry': np.ones(len(tr),dtype=bool),
              'E1_formula_OOD': ~tr.fkey.isin(estm_f).to_numpy(),
              'E2_article_OOD': ~tr.doi.isin(estm_d).to_numpy(),
              'E3_formula_plus_article_OOD': (~tr.fkey.isin(estm_f)&~tr.doi.isin(estm_d)).to_numpy(),
           }
-          out=[];predout=estm[['formula','T','zT','doi']].copy()
+          out=[]; predout=estm[['formula','T','zT','doi']].copy()
           for name,mask in protocols.items():
               d=tr.loc[mask]
               model=XGBRegressor(n_estimators=700,max_depth=7,learning_rate=.035,subsample=.85,colsample_bytree=.85,min_child_weight=3,reg_lambda=1.0,objective='reg:squarederror',random_state=3,n_jobs=2)
-              model.fit(X(d),d.zT.to_numpy(float))
-              p=model.predict(Xtest)
-              predout[name]=p
+              model.fit(X(d),d.zT.to_numpy(float)); p=model.predict(Xtest); predout[name]=p
               out.append({'protocol':name,'train_rows':len(d),'train_formulas':d.fkey.nunique(),'train_dois':d.doi.replace('',np.nan).nunique(),'test_rows':len(estm),'test_formulas':estm.fkey.nunique(),'r2':r2_score(ytest,p),'spearman':spearmanr(ytest,p).statistic,'mae':mean_absolute_error(ytest,p),'rmse':mean_squared_error(ytest,p)**0.5})
           overlap=pd.DataFrame([
               {'metric':'starry_zT_rows_pre_filter','value':len(tr)},
@@ -109,7 +96,7 @@ jobs:
               {'metric':'estm_rows','value':len(estm)},
               {'metric':'estm_unique_formula_keys','value':estm.fkey.nunique()},
               {'metric':'starry_rows_exact_ESTM_formula','value':int(tr.fkey.isin(estm_f).sum())},
-              {'metric':'starry_rows_ESTМ_source_DOI','value':int(tr.doi.isin(estm_d).sum())},
+              {'metric':'starry_rows_ESTM_source_DOI','value':int(tr.doi.isin(estm_d).sum())},
               {'metric':'starry_rows_either_formula_or_DOI','value':int((tr.fkey.isin(estm_f)|tr.doi.isin(estm_d)).sum())},
               {'metric':'ESTM_formulas_seen_in_Starry','value':int(estm.loc[estm.fkey.isin(set(tr.fkey)),'fkey'].nunique())},
               {'metric':'ESTM_DOIs_seen_in_Starry','value':int(estm.loc[estm.doi.isin(set(tr.doi)),'doi'].nunique())},
@@ -119,8 +106,7 @@ jobs:
           pd.DataFrame(out).to_csv('tmp_estm_export/benchmark/metrics.csv',index=False)
           overlap.to_csv('tmp_estm_export/benchmark/overlap.csv',index=False)
           predout.to_csv('tmp_estm_export/benchmark/predictions.csv',index=False)
-          with open('tmp_estm_export/benchmark/summary.txt','w') as f:
-              f.write(pd.DataFrame(out).to_string(index=False)+'\n\n'+overlap.to_string(index=False)+'\n')
+          with open('tmp_estm_export/benchmark/summary.txt','w') as f:f.write(pd.DataFrame(out).to_string(index=False)+'\n\n'+overlap.to_string(index=False)+'\n')
           print(pd.DataFrame(out).to_string(index=False)); print(overlap.to_string(index=False))
           PY
           python /tmp/run_estm.py
