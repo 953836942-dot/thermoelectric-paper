@@ -24,22 +24,27 @@ jobs:
         run: pip install --quiet pandas openpyxl
       - name: Download and convert ESTM
         run: |
-          mkdir -p tmp_estm_export
+          mkdir -p tmp_estm_export/chunks
           python - <<'PY'
-          import pandas as pd
-          import urllib.request
-          url = 'https://raw.githubusercontent.com/KRICT-DATA/SIMD/main/dataset/estm.xlsx'
-          urllib.request.urlretrieve(url, 'tmp_estm_export/estm.xlsx')
-          df = pd.read_excel('tmp_estm_export/estm.xlsx')
-          df.to_csv('tmp_estm_export/estm.csv', index=False)
-          print(df.shape)
-          print(df.columns.tolist())
+          import pandas as pd, urllib.request, gzip, base64, pathlib
+          url='https://raw.githubusercontent.com/KRICT-DATA/SIMD/main/dataset/estm.xlsx'
+          urllib.request.urlretrieve(url,'tmp_estm_export/estm.xlsx')
+          df=pd.read_excel('tmp_estm_export/estm.xlsx')
+          csv=df.to_csv(index=False).encode()
+          enc=base64.b64encode(gzip.compress(csv,compresslevel=9)).decode()
+          chunk=24000
+          d=pathlib.Path('tmp_estm_export/chunks')
+          for p in d.glob('*.txt'): p.unlink()
+          for i in range(0,len(enc),chunk):
+              (d/f'chunk_{i//chunk:03d}.txt').write_text(enc[i:i+chunk])
+          pathlib.Path('tmp_estm_export/manifest.txt').write_text(f'rows={len(df)}\ncols={len(df.columns)}\nbase64_chars={len(enc)}\nchunks={(len(enc)+chunk-1)//chunk}\n')
+          print(df.shape, len(enc), (len(enc)+chunk-1)//chunk)
           PY
-          rm tmp_estm_export/estm.xlsx
-      - name: Commit CSV export
+          rm -f tmp_estm_export/estm.xlsx
+      - name: Commit export
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add tmp_estm_export/estm.csv
-          git commit -m 'Temporary ESTM CSV export' || exit 0
+          git add tmp_estm_export/chunks tmp_estm_export/manifest.txt
+          git commit -m 'Add temporary ESTM transfer chunks' || exit 0
           git push origin HEAD:tmp-estm-export-20260901
