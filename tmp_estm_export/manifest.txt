@@ -1,0 +1,4 @@
+rows=5205
+cols=8
+base64_chars=216496
+chunks=10
